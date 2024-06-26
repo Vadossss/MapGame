@@ -68,8 +68,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var locationNow: Point
     var uri: Uri =
         Uri.parse("yandexnavi://build_route_on_map?lat_from=57.732670&lon_from=40.912260&lat_to=55.76&lon_to=37.64")
+
+
     private val topLeft = Point(57.731909, 40.914427)  // Пример координат для Москвы (верхний левый угол зоны)
     private val bottomRight = Point(57.731334, 40.915704)  // Пример координат для Москвы (нижний правый угол зоны)
+
+
     private lateinit var video: VideoView
     private var isFirstResume = true
     lateinit var btnSkip: Button
@@ -94,36 +98,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
             return
         }
-//        val map = mapView.mapWindow.map
-//
-//        collection = map.mapObjects.addCollection()
-//        collection.addPlacemark().apply {
-//            geometry = locationNow
-//            useAnimation().apply {
-//                setIcon(
-//                    AnimatedImageProvider.fromAsset(this@MainActivity, "drawable/anim.png"),
-//                    IconStyle().apply { scale = 0.6f })
-//            }.play()
-//        }
 
 
-
-
-//        // Setup buttons
-//        findViewById<Button>(R.id.button_change_visibility).apply {
-//            setOnClickListener {
-//                showToast("${if (collection.isVisible) "Hide" else "Show"} all objects")
-//                collection.isVisible = !collection.isVisible
-//            }
-//        }
-//
-//        findViewById<Button>(R.id.button_focus_polyline).apply {
-//            setOnClickListener {
-//                val geometry = Geometry.fromPolyline(polylineMapObject.geometry)
-//                // Focus camera on polyline
-//                map.move(map.cameraPosition(geometry))
-//            }
-//        }
 //
 //        findViewById<Button>(R.id.button_focus_polygon).apply {
 //            setOnClickListener {
@@ -164,10 +140,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
 
+    @SuppressLint("ClickableViewAccessibility")
     private val iconTapListen = MapObjectTapListener { _, _ ->
         Toast.makeText(this, "Оно работает", Toast.LENGTH_SHORT).show()
-//        val intent = Intent(this, InfoActivity::class.java)
-//        startActivity(intent)
         val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
         val myDialog = Dialog(this)
         myDialog.setContentView(dialogBinding)
@@ -219,8 +194,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
             video.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
-//                    video.stopPlayback()
-//                    video.visibility = View.INVISIBL
                     if (btnClose.visibility == View.INVISIBLE)
                         btnClose.visibility = View.VISIBLE
                     else
@@ -312,20 +285,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             isFirstResume = false
             return
         }
-
-
-
-//
-//        if (isUserInZone(locationNow, topLeft, bottomRight)) {
-//            video.visibility = View.VISIBLE
-//            video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video1)
-//            val media : MediaController = MediaController(this)
-//            media.setAnchorView(video)
-//            video.setMediaController(media)
-//            video.start()
-//        } else {
-//            Log.d("MainActivity", "User is outside the zone")
-//        }
     }
 
     private fun put() {
@@ -385,67 +344,54 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     @SuppressLint("ClickableViewAccessibility")
     fun click(view: View) {
-//        getLastKnownLocation()
-//        put()
-        video.visibility = View.VISIBLE
-        video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video1)
-//        val media : MediaController = MediaController(this)
-//        media.setAnchorView(video)
-//        video.setMediaController(media)
-        video.setOnPreparedListener { mp ->
-            val videoWidth = mp.videoWidth
-            val videoHeight = mp.videoHeight
-
-            val videoViewWidth = video.width
-            val videoViewHeight = video.height
-
-            val layoutParams = video.layoutParams
-
-            // Вычислите коэффициенты масштабирования
-            val widthRatio = videoViewWidth.toFloat() / videoWidth
-            val heightRatio = videoViewHeight.toFloat() / videoHeight
-
-            // Примените минимальный коэффициент масштабирования для масштабирования видео
-            val scale = widthRatio.coerceAtMost(heightRatio)
-
-            layoutParams.width = (videoWidth * scale).toInt()
-            layoutParams.height = (videoHeight * scale).toInt()
-
-            video.layoutParams = layoutParams
-        }
-
-        video.setOnCompletionListener {
-            video.stopPlayback()
-            video.visibility = View.INVISIBLE
-            btnSkip.visibility = View.INVISIBLE
-        }
-
-        video.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-//                    video.stopPlayback()
-//                    video.visibility = View.INVISIBL
-                if (btnSkip.visibility == View.INVISIBLE)
-                    btnSkip.visibility = View.VISIBLE
-                else
-                    btnSkip.visibility = View.INVISIBLE
-            }
-            true
-        }
-
-        video.start()
-
-//        val map = mapView.mapWindow.map
+////        getLastKnownLocation()
+////        put()
+//        video.visibility = View.VISIBLE
+//        video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video1)
+////        val media : MediaController = MediaController(this)
+////        media.setAnchorView(video)
+////        video.setMediaController(media)
+//        video.setOnPreparedListener { mp ->
+//            val videoWidth = mp.videoWidth
+//            val videoHeight = mp.videoHeight
 //
-//        collection = map.mapObjects.addCollection()
-//        collection.addPlacemark().apply {
-//            geometry = locationNow
-//            useAnimation().apply {
-//                setIcon(
-//                    AnimatedImageProvider.fromAsset(this@MainActivity, "animation.png"),
-//                    IconStyle().apply { scale = 0.6f })
-//            }.play()
+//            val videoViewWidth = video.width
+//            val videoViewHeight = video.height
+//
+//            val layoutParams = video.layoutParams
+//
+//            // Вычислите коэффициенты масштабирования
+//            val widthRatio = videoViewWidth.toFloat() / videoWidth
+//            val heightRatio = videoViewHeight.toFloat() / videoHeight
+//
+//            // Примените минимальный коэффициент масштабирования для масштабирования видео
+//            val scale = widthRatio.coerceAtMost(heightRatio)
+//
+//            layoutParams.width = (videoWidth * scale).toInt()
+//            layoutParams.height = (videoHeight * scale).toInt()
+//
+//            video.layoutParams = layoutParams
 //        }
-//        collection.clear().apply {}
+//
+//        video.setOnCompletionListener {
+//            video.stopPlayback()
+//            video.visibility = View.INVISIBLE
+//            btnSkip.visibility = View.INVISIBLE
+//        }
+//
+//        video.setOnTouchListener { _, event ->
+//            if (event.action == MotionEvent.ACTION_DOWN) {
+////                    video.stopPlayback()
+////                    video.visibility = View.INVISIBL
+//                if (btnSkip.visibility == View.INVISIBLE)
+//                    btnSkip.visibility = View.VISIBLE
+//                else
+//                    btnSkip.visibility = View.INVISIBLE
+//            }
+//            true
+//        }
+//
+//        video.start()
     }
 
     private fun startLocationUpdates() {
@@ -495,21 +441,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             collection = map.mapObjects.addCollection()
             userLocationMarker = collection.addPlacemark().apply {
                 geometry = locationNow
-//                useAnimation().apply {
-//                    setIcon(
-//                        AnimatedImageProvider.fromAsset(this@MainActivity, "tree.png"),
-//                        IconStyle().apply { scale = 0.8f })
-//                }.play()
-                    setIcon(
-                        ImageProvider.fromResource(this@MainActivity, R.drawable.tree),
-                        IconStyle().apply {
-                            anchor = PointF(0.5f, 0.5f)
-                            rotationType = RotationType.ROTATE
-                            flat = true
-                            scale = 0.6f
+                setIcon(
+                    ImageProvider.fromResource(this@MainActivity, R.drawable.tree),
+                    IconStyle().apply {
+                        anchor = PointF(0.5f, 0.5f)
+                        rotationType = RotationType.ROTATE
+                        flat = true
+                        scale = 0.6f
 
-                        }
-                    )
+                    }
+                )
             }
             isMarkerInitialized = true
         } else {
@@ -521,13 +462,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             Animation(Animation.Type.SMOOTH, 1f),
             null
         )
-    }
-
-
-    fun clickSkip(view: View) {
-        video.stopPlayback()
-        video.visibility = View.INVISIBLE
-        btnSkip.visibility = View.INVISIBLE
     }
 
     private fun getLastKnownLocation() {
@@ -569,53 +503,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         Animation(Animation.Type.SMOOTH, 3f), null)
 
                     put()
-//                    val map = mapView.mapWindow.map
-//
-//                    collection = map.mapObjects.addCollection()
-//                    collection.addPlacemark().apply {
-//                        geometry = locationNow
-//                        useAnimation().apply {
-//                            setIcon(
-//                                AnimatedImageProvider.fromAsset(this@MainActivity, "animation.png"),
-//                                IconStyle().apply { scale = 0.6f })
-//                        }.play()
-//                    }
-
-//                    val placemark = collection.addPlacemark().apply {
-//                        geometry = GeometryProvider.compositeIconPoint
-//
-//                        // Set text near the placemark with the custom TextStyle
-//
-//                        setText(
-//                            "Special place",
-//                            TextStyle().apply {
-//                                size = 10f
-//                                placement = TextStyle.Placement.RIGHT
-//                                offset = 5f
-//                            },
-//                        )
-//                    }
-//
-//                    placemark.useCompositeIcon().apply {
-                        // Combine several icons in the single composite icon
-//                        setIcon(
-//                            "pin",
-//                            ImageProvider.fromResource(this@MainActivity, R.drawable.anim),
-//                            IconStyle().apply {
-//                                anchor = PointF(0.5f, 1.0f)
-//                                scale = 0.9f
-//                            }
-//                        )
-//                        setIcon(
-//                            "point",
-//                            ImageProvider.fromResource(this@MainActivity, R.drawable.anim),
-//                            IconStyle().apply {
-//                                anchor = PointF(0.5f, 0.5f)
-//                                flat = true
-//                                scale = 0.05f
-//                            }
-//                        )
-                    //}
                 } else {
                     Log.d(TAG, "Last known location is null.")
                 }
@@ -631,8 +518,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return userLocation.latitude in bottomRight.latitude..topLeft.latitude &&
                 userLocation.longitude in topLeft.longitude..bottomRight.longitude
     }
-
-    // Пример использования:
 
 
     override fun onRequestPermissionsResult(
