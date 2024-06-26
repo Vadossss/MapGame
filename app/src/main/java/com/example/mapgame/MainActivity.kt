@@ -2,9 +2,11 @@ package com.example.mapgame
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.app.Dialog
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.PointF
+import android.graphics.drawable.ColorDrawable
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -16,6 +18,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
@@ -159,10 +162,75 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onStop()
     }
 
+
+
     private val iconTapListen = MapObjectTapListener { _, _ ->
         Toast.makeText(this, "Оно работает", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, InfoActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this, InfoActivity::class.java)
+//        startActivity(intent)
+        val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
+        val myDialog = Dialog(this)
+        myDialog.setContentView(dialogBinding)
+        myDialog.setCancelable(true)
+        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        myDialog.show()
+
+        val btnClose = findViewById<ImageView>(R.id.btnClose)
+        btnClose.setOnClickListener {
+            video.stopPlayback()
+            video.visibility = View.INVISIBLE
+            btnClose.visibility = View.INVISIBLE
+        }
+
+        val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
+        btnBattle.setOnClickListener {
+            myDialog.dismiss()
+            video.visibility = View.VISIBLE
+            video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video1)
+
+            video.setOnPreparedListener { mp ->
+                val videoWidth = mp.videoWidth
+                val videoHeight = mp.videoHeight
+
+                val videoViewWidth = video.width
+                val videoViewHeight = video.height
+
+                val layoutParams = video.layoutParams
+
+                // Вычислите коэффициенты масштабирования
+                val widthRatio = videoViewWidth.toFloat() / videoWidth
+                val heightRatio = videoViewHeight.toFloat() / videoHeight
+
+                // Примените минимальный коэффициент масштабирования для масштабирования видео
+                val scale = widthRatio.coerceAtMost(heightRatio)
+
+                val d = findViewById<View>(R.id.lay)
+                layoutParams.width = d.layoutParams.width
+                layoutParams.height = d.layoutParams.height
+
+                video.layoutParams = layoutParams
+            }
+
+            video.setOnCompletionListener {
+                video.stopPlayback()
+                video.visibility = View.INVISIBLE
+                btnClose.visibility = View.INVISIBLE
+            }
+
+            video.setOnTouchListener { _, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+//                    video.stopPlayback()
+//                    video.visibility = View.INVISIBL
+                    if (btnClose.visibility == View.INVISIBLE)
+                        btnClose.visibility = View.VISIBLE
+                    else
+                        btnClose.visibility = View.INVISIBLE
+                }
+                true
+            }
+
+            video.start()
+        }
         true
     }
 
