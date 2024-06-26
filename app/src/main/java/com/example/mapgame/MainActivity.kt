@@ -14,6 +14,8 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -21,8 +23,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import android.widget.VideoView
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -35,8 +39,12 @@ import com.yandex.mapkit.RequestPointType
 import com.yandex.mapkit.directions.driving.DrivingRoute
 import com.yandex.mapkit.directions.driving.DrivingRouterType
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.IconStyle
+import com.yandex.mapkit.map.InputListener
+import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -47,6 +55,9 @@ import com.yandex.mapkit.navigation.automotive.NavigationFactory
 import com.yandex.mapkit.navigation.automotive.NavigationListener
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -61,8 +72,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var azimuth: Float = 0f
 
 
-
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mapView: MapView
     private lateinit var locationNow: Point
@@ -70,14 +79,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Uri.parse("yandexnavi://build_route_on_map?lat_from=57.732670&lon_from=40.912260&lat_to=55.76&lon_to=37.64")
 
 
-    private val topLeft = Point(57.731909, 40.914427)  // Пример координат для Москвы (верхний левый угол зоны)
-    private val bottomRight = Point(57.731334, 40.915704)  // Пример координат для Москвы (нижний правый угол зоны)
+    private val topLeft =
+        Point(57.731909, 40.914427)  // Пример координат для Москвы (верхний левый угол зоны)
+    private val bottomRight =
+        Point(57.731334, 40.915704)  // Пример координат для Москвы (нижний правый угол зоны)
 
 
     private lateinit var video: VideoView
     private var isFirstResume = true
-    lateinit var btnSkip: Button
+    private lateinit var btnSkip: Button
     private lateinit var collection: MapObjectCollection
+
+    private var isCheckCameraPosition: Boolean = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,11 +106,27 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         video = findViewById(R.id.videoCom)
         btnSkip = findViewById(R.id.btnSkip)
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
             return
         }
+
+        val map = mapView.mapWindow.map
 
 
 //
@@ -124,7 +153,42 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         allIcon()
 
+
+        val maas = object : CameraListener {
+            override fun onCameraPositionChanged(
+                p0: Map,
+                p1: CameraPosition,
+                p2: CameraUpdateReason,
+                p3: Boolean
+            ) {
+                if (p3) {
+                    Log.d(TAG, "CheckCameraPositionfasssssss")
+                    if (isCheckCameraPosition)
+                        isCheckCameraPosition = false
+                    val handler = Handler(Looper.getMainLooper())
+//                    GlobalScope.launch {
+//                        // Задержка на 5 секунд
+//                        delay(10000)
+//                        // Действие, которое вы хотите выполнить через 5 секунд
+//                        isCheckCameraPosition = true
+//                        Log.d(TAG, "CheckCameraPosition")
+//                    }
+                    val runnable = Runnable {
+                        isCheckCameraPosition = true
+                        Log.d(TAG, "CheckCameraPosition")
+                    }
+
+                    handler.postDelayed(runnable, 5000)
+                }
+
+            }
+
+        }
+
+        mapView.map.addCameraListener(maas)
     }
+
+
     override fun onStart() {
         super.onStart()
         MapKitFactory.getInstance().onStart()
@@ -139,8 +203,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
 
-
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "InflateParams")
     private val iconTapListen = MapObjectTapListener { _, _ ->
         Toast.makeText(this, "Оно работает", Toast.LENGTH_SHORT).show()
         val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
@@ -239,9 +302,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun putUri() {
         val navigation = NavigationFactory.createNavigation(DrivingRouterType.ONLINE)
         navigation.resolveUri(uri.toString())
-        Toast.makeText(this,navigation.routes.toString(), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, navigation.routes.toString(), Toast.LENGTH_SHORT).show()
         val nl = object : NavigationListener {
-
 
 
             override fun onRoutesRequested(p0: MutableList<RequestPoint>) {
@@ -395,9 +457,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun startLocationUpdates() {
+//        val locationRequest = LocationRequest.create().apply {
+//            interval = 1000 // 10 секунд
+//            fastestInterval = 1000 // 5 секунд
+//            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+//        }
         val locationRequest = LocationRequest.create().apply {
-            interval = 3000 // 10 секунд
-            fastestInterval = 5000 // 5 секунд
+            interval = 1000 // 10 секунд
+            fastestInterval = 1000 // 5 секунд
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
@@ -428,19 +495,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
     }
+
     private lateinit var userLocationMarker: PlacemarkMapObject
     private var isMarkerInitialized = false
 
     @SuppressLint("SuspiciousIndentation")
     private fun updateLocationOnMap(location: Location) {
         val userLocation = Point(location.latitude, location.longitude)
-
         if (!isMarkerInitialized) {
-            //userLocationMarker = mapView.map.mapObjects.addPlacemark(userLocation)
             val map = mapView.mapWindow.map
             collection = map.mapObjects.addCollection()
             userLocationMarker = collection.addPlacemark().apply {
-                geometry = locationNow
+                geometry = userLocation
+                direction = azimuth
                 setIcon(
                     ImageProvider.fromResource(this@MainActivity, R.drawable.tree),
                     IconStyle().apply {
@@ -448,20 +515,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         rotationType = RotationType.ROTATE
                         flat = true
                         scale = 0.6f
-
                     }
                 )
             }
             isMarkerInitialized = true
         } else {
-            userLocationMarker.geometry = locationNow
+            userLocationMarker.geometry = userLocation
+            userLocationMarker.direction = azimuth
         }
-
-        mapView.map.move(
-            CameraPosition(locationNow, 17.0f, azimuth, 100f),
-            Animation(Animation.Type.SMOOTH, 1f),
-            null
-        )
+        if (isCheckCameraPosition) {
+            mapView.map.move(
+                CameraPosition(locationNow, 17.0f, azimuth, 100f),
+                Animation(Animation.Type.SMOOTH, 1f),
+                null
+            )
+        }
     }
 
     private fun getLastKnownLocation() {
@@ -480,12 +548,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                this,
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ),
-                LOCATION_PERMISSION_REQUEST_CODE)
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
             return
         }
         CameraPosition()
@@ -499,8 +569,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             locationNow,
                             17.0f,
                             azimuth,
-                            100.0f),
-                        Animation(Animation.Type.SMOOTH, 3f), null)
+                            100.0f
+                        ),
+                        Animation(Animation.Type.SMOOTH, 3f), null
+                    )
 
                     put()
                 } else {
@@ -511,7 +583,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 Log.e(TAG, "Error getting last known location", e)
             }
     }
-
 
 
     fun isUserInZone(userLocation: Point, topLeft: Point, bottomRight: Point): Boolean {
@@ -550,6 +621,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             Sensor.TYPE_ACCELEROMETER -> {
                 System.arraycopy(event.values, 0, gravity, 0, event.values.size)
             }
+
             Sensor.TYPE_MAGNETIC_FIELD -> {
                 System.arraycopy(event.values, 0, geomagnetic, 0, event.values.size)
             }
@@ -560,7 +632,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             SensorManager.getOrientation(r, orientation)
             azimuth = Math.toDegrees(orientation[0].toDouble()).toFloat()
             azimuth = (azimuth + 360) % 360
-            Log.d("Azimuth", "Current azimuth: $azimuth")
+            //Log.d("Azimuth", "Current azimuth: $azimuth")
         }
     }
 
