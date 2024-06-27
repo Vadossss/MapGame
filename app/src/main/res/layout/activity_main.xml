@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:onClick="click"
         android:text="Button"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/videoCom"
         app:layout_constraintStart_toStartOf="parent"

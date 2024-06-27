@@ -17,6 +17,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.JsonReader
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -54,9 +55,16 @@ import com.yandex.mapkit.navigation.automotive.NavigationFactory
 import com.yandex.mapkit.navigation.automotive.NavigationListener
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -107,27 +115,28 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         placemark?.isVisible = isVisible
     }
 
+    private fun parseJsonInString(name : String): String {
+        val stringBuilder = StringBuilder()
+        val inputStream = this.assets.open(name)
+        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+
+        bufferedReader.use { reader ->
+            var line = reader.readLine()
+            while (line != null) {
+                stringBuilder.append(line)
+                line = reader.readLine()
+            }
+        }
+        Log.d(TAG, stringBuilder.toString())
+        return stringBuilder.toString()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.setApiKey("204ee658-86b7-453b-90db-dd6a00cdc770")
         MapKitFactory.initialize(this)
         setContentView(R.layout.activity_main)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        getLastKnownLocation()
-        mapView = findViewById(R.id.mapview)
-        mapView.map.isTiltGesturesEnabled = false
-        mapView.map.isZoomGesturesEnabled = false
-        video = findViewById(R.id.videoCom)
-        btnSkip = findViewById(R.id.btnSkip)
-
-
-        btnPositionNow = findViewById(R.id.btnPositionNow)
-        btnPositionNow.setOnClickListener {
-            updateLocationOnMap(locationNow)
-            isCheckCameraPosition = true
-        }
-
-
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -147,33 +156,44 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             )
             return
         }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        getLastKnownLocation()
+
+
+        mapView = findViewById(R.id.mapview)
+        mapView.map.isTiltGesturesEnabled = false
+        mapView.map.isZoomGesturesEnabled = false
+
+
+
+
+        val jsonStr = parseJsonInString("customization.json")
+        mapView.map.isNightModeEnabled = true
+        mapView.map.setMapStyle(jsonStr)
+
+
+        video = findViewById(R.id.videoCom)
+        btnSkip = findViewById(R.id.btnSkip)
+
+
+        btnPositionNow = findViewById(R.id.btnPositionNow)
+        btnPositionNow.setOnClickListener {
+            isCheckCameraPosition = true
+            updateLocationOnMap(locationNow)
+        }
+
+
+
+        startLocationUpdates()
 
         val map = mapView.mapWindow.map
 
 
         sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        editor.clear()
-//        editor.apply()
+
+
         checkPreferences()
-//
-//        findViewById<Button>(R.id.button_focus_polygon).apply {
-//            setOnClickListener {
-//                val geometry = Geometry.fromPolygon(polygonMapObject.geometry)
-//                // Focus camera on polygon
-//                map.move(map.cameraPosition(geometry))
-//            }
-//        }
-//
-//        findViewById<Button>(R.id.button_geometry).apply {
-//            setOnClickListener {
-//                // Turned off/on visibility
-//                isShowGeometryOnMap = !isShowGeometryOnMap
-//                text = "${if (isShowGeometryOnMap) "Off" else "On"} geometry"
-//                collection.traverse(geometryVisibilityVisitor)
-//            }
-//        }
-        startLocationUpdates()
+
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -181,6 +201,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         allIcon()
 
 
+        var cameraPositionJob : Job? = null
+        val coroutineScope = CoroutineScope(Dispatchers.Main)
 
 
         cameraList = object : CameraListener {
@@ -195,17 +217,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     Log.d(TAG, "CheckCameraPositionfasssssss")
                     if (isCheckCameraPosition)
                         isCheckCameraPosition = false
-                    GlobalScope.launch {
-                        // Задержка на 5 секунд
+
+                    cameraPositionJob?.cancel()
+                    cameraPositionJob = coroutineScope.launch {
                         delay(10000)
-                        // Действие, которое вы хотите выполнить через 5 секунд
                         isCheckCameraPosition = true
-                        Log.d(TAG, "CheckCameraPosition")
+//                        Log.d(TAG, "CheckCameraPosition")
                     }
                     Log.d(TAG, "CheckCameraPosition: $isCheckCameraPosition")
                     } else {
                         isCheckCameraPosition = false
-                        Log.d(TAG, "CheckCameraPositionfasssssss: $isCheckCameraPosition")
+//                        Log.d(TAG, "CheckCameraPositionfasssssss: $isCheckCameraPosition")
                     }
                 }
             }
@@ -268,26 +290,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             video.visibility = View.VISIBLE
             video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video1)
 
-            video.setOnPreparedListener { mp ->
-                val videoWidth = mp.videoWidth
-                val videoHeight = mp.videoHeight
-
-                val videoViewWidth = video.width
-                val videoViewHeight = video.height
-
+            video.setOnPreparedListener {
                 val layoutParams = video.layoutParams
-
-                // Вычислите коэффициенты масштабирования
-                val widthRatio = videoViewWidth.toFloat() / videoWidth
-                val heightRatio = videoViewHeight.toFloat() / videoHeight
-
-                // Примените минимальный коэффициент масштабирования для масштабирования видео
-                val scale = widthRatio.coerceAtMost(heightRatio)
-
                 val d = findViewById<View>(R.id.lay)
                 layoutParams.width = d.layoutParams.width
                 layoutParams.height = d.layoutParams.height
-
                 video.layoutParams = layoutParams
             }
 
@@ -570,8 +577,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 //            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 //        }
         val locationRequest = LocationRequest.create().apply {
-            interval = 1000 // 10 секунд
-            fastestInterval = 1000 // 5 секунд
+            interval = 100 // 10 секунд
+            fastestInterval = 100 // 5 секунд
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
@@ -606,6 +613,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var userLocationMarker: PlacemarkMapObject
     private var isMarkerInitialized = false
+    private var oldAzimuth: Float = 0.0f
 
     @SuppressLint("SuspiciousIndentation")
     private fun updateLocationOnMap(location: Point) {
@@ -637,8 +645,30 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
+//            if ((oldAzimuth - azimuth) > 20 && azimuth > 20 && azimuth < 340) {
+//                mapView.map.move(
+//                    CameraPosition(locationNow, 17.0f, oldAzimuth+20, 100f),
+//                    Animation(Animation.Type.SMOOTH, 1f),
+//                    null
+//                )
+//            }
+//            else if ((oldAzimuth - azimuth) < -20 && azimuth > 20 && azimuth < 340) {
+//                mapView.map.move(
+//                    CameraPosition(locationNow, 17.0f, oldAzimuth-20, 100f),
+//                    Animation(Animation.Type.SMOOTH, 1f),
+//                    null
+//                )
+//            }
+//            else {
+//                mapView.map.move(
+//                    CameraPosition(locationNow, 17.0f, azimuth, 100f),
+//                    Animation(Animation.Type.SMOOTH, 1f),
+//                    null
+//                )
+//            }
             Log.d(TAG, "MoveCamera")
         }
+        oldAzimuth = azimuth
     }
 
     private fun getLastKnownLocation() {
@@ -667,30 +697,30 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             )
             return
         }
-//        CameraPosition()
-//        fusedLocationClient.lastLocation
-//            .addOnSuccessListener(this) { location ->
-//                if (location != null) {
-//                    Log.d(TAG, "Latitude: ${location.latitude}, Longitude: ${location.longitude}")
-//                    locationNow = Point(location.latitude, location.longitude)
-//                    mapView.map.move(
-//                        CameraPosition(
-//                            locationNow,
-//                            17.0f,
-//                            azimuth,
-//                            100.0f
-//                        ),
-//                        Animation(Animation.Type.SMOOTH, 3f), null
-//                    )
-//
-//                    put()
-//                } else {
-//                    Log.d(TAG, "Last known location is null.")
-//                }
-//            }
-//            .addOnFailureListener(this) { e ->
-//                Log.e(TAG, "Error getting last known location", e)
-//            }
+        CameraPosition()
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener(this) { location ->
+                if (location != null) {
+                    Log.d(TAG, "Latitude: ${location.latitude}, Longitude: ${location.longitude}")
+                    locationNow = Point(location.latitude, location.longitude)
+                    mapView.map.move(
+                        CameraPosition(
+                            locationNow,
+                            17.0f,
+                            azimuth,
+                            100.0f
+                        ),
+                        //Animation(Animation.Type.SMOOTH, 3f), null
+                    )
+
+                    put()
+                } else {
+                    Log.d(TAG, "Last known location is null.")
+                }
+            }
+            .addOnFailureListener(this) { e ->
+                Log.e(TAG, "Error getting last known location", e)
+            }
     }
 
 
