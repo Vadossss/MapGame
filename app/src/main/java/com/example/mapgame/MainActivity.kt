@@ -3,6 +3,8 @@ package com.example.mapgame
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PointF
@@ -11,7 +13,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -21,12 +22,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import android.widget.VideoView
-import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -43,7 +43,6 @@ import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.IconStyle
-import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
@@ -89,9 +88,24 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var isFirstResume = true
     private lateinit var btnSkip: Button
     private lateinit var collection: MapObjectCollection
+    private lateinit var btnPositionNow: Button
 
     private var isCheckCameraPosition: Boolean = true
 
+    private lateinit var sharedPreferences: SharedPreferences
+
+    private lateinit var cameraList : CameraListener
+
+    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+        if (key == getString(R.string.quest1)) {
+            updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(key, false))
+            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(key, false))
+        }
+    }
+
+    private fun updatePlacemarkVisibility(placemark: PlacemarkMapObject?, isVisible: Boolean) {
+        placemark?.isVisible = isVisible
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +119,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mapView.map.isZoomGesturesEnabled = false
         video = findViewById(R.id.videoCom)
         btnSkip = findViewById(R.id.btnSkip)
+
+
+        btnPositionNow = findViewById(R.id.btnPositionNow)
+        btnPositionNow.setOnClickListener {
+            updateLocationOnMap(locationNow)
+            isCheckCameraPosition = true
+        }
+
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -129,6 +151,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val map = mapView.mapWindow.map
 
 
+        sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
+//        val editor = sharedPreferences.edit()
+//        editor.clear()
+//        editor.apply()
+        checkPreferences()
 //
 //        findViewById<Button>(R.id.button_focus_polygon).apply {
 //            setOnClickListener {
@@ -154,38 +181,54 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         allIcon()
 
 
-        val maas = object : CameraListener {
+
+
+        cameraList = object : CameraListener {
             override fun onCameraPositionChanged(
                 p0: Map,
                 p1: CameraPosition,
                 p2: CameraUpdateReason,
                 p3: Boolean
             ) {
-                if (p3) {
+                if (p2 == CameraUpdateReason.GESTURES) {
+                    if (p3) {
                     Log.d(TAG, "CheckCameraPositionfasssssss")
                     if (isCheckCameraPosition)
                         isCheckCameraPosition = false
-                    val handler = Handler(Looper.getMainLooper())
-//                    GlobalScope.launch {
-//                        // Задержка на 5 секунд
-//                        delay(10000)
-//                        // Действие, которое вы хотите выполнить через 5 секунд
-//                        isCheckCameraPosition = true
-//                        Log.d(TAG, "CheckCameraPosition")
-//                    }
-                    val runnable = Runnable {
+                    GlobalScope.launch {
+                        // Задержка на 5 секунд
+                        delay(10000)
+                        // Действие, которое вы хотите выполнить через 5 секунд
                         isCheckCameraPosition = true
                         Log.d(TAG, "CheckCameraPosition")
                     }
-
-                    handler.postDelayed(runnable, 5000)
+                    Log.d(TAG, "CheckCameraPosition: $isCheckCameraPosition")
+                    } else {
+                        isCheckCameraPosition = false
+                        Log.d(TAG, "CheckCameraPositionfasssssss: $isCheckCameraPosition")
+                    }
                 }
-
             }
-
         }
 
-        mapView.map.addCameraListener(maas)
+        mapView.map.addCameraListener(cameraList)
+
+        //sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
+        //sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+    }
+
+
+    private fun checkPreferences() {
+        if (!sharedPreferences.contains(getString(R.string.quest1))) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean(getString(R.string.quest1), true) // Установить изначальное значение для quest1
+            editor.apply()
+        }
+        if (!sharedPreferences.contains(getString(R.string.quest2))) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean(getString(R.string.quest2), false) // Установить изначальное значение для quest1
+            editor.apply()
+        }
     }
 
 
@@ -202,15 +245,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onStop()
     }
 
-
-    @SuppressLint("ClickableViewAccessibility", "InflateParams")
-    private val iconTapListen = MapObjectTapListener { _, _ ->
-        Toast.makeText(this, "Оно работает", Toast.LENGTH_SHORT).show()
+    private fun newDialog(name: String) {
         val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
         val myDialog = Dialog(this)
+        val nameQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
         myDialog.setContentView(dialogBinding)
         myDialog.setCancelable(true)
         myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        nameQuest.text = name
         myDialog.show()
 
         val btnClose = findViewById<ImageView>(R.id.btnClose)
@@ -264,18 +306,41 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
                 true
             }
+            val editor = sharedPreferences.edit()
+            var currentState = sharedPreferences.getBoolean(getString(R.string.quest1), false)
+            editor.putBoolean(getString(R.string.quest1), !currentState)
+            editor.apply()
+            updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
+            Log.d(TAG, "QUEST1 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest1), false).toString())
+
+            currentState = sharedPreferences.getBoolean(getString(R.string.quest2), false)
+            editor.putBoolean(getString(R.string.quest2), !currentState)
+            editor.apply()
+            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
+            Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
 
             video.start()
         }
-        true
     }
 
+
+    @SuppressLint("ClickableViewAccessibility", "InflateParams")
+    private val iconTapListen = MapObjectTapListener { _, _ ->
+        Toast.makeText(this, "Оно работает", Toast.LENGTH_SHORT).show()
+        newDialog("Это кощей")
+
+        true
+    }
+    private var placemark : PlacemarkMapObject? = null
+    private var placemark1 : PlacemarkMapObject? = null
     fun allIcon() {
         val map = mapView.mapWindow.map
         collection = map.mapObjects.addCollection()
-        val placemark = collection.addPlacemark().apply {
+
+        placemark = collection.addPlacemark().apply {
             geometry = Point(57.736260, 40.921054)
             addTapListener(iconTapListen)
+
             // Set text near the placemark with the custom TextStyle
 
             setText(
@@ -286,17 +351,45 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     offset = 1f
                 },
             )
+            useCompositeIcon().apply {
+                setIcon(
+                    "pin",
+                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
+                    IconStyle().apply {
+                        anchor = PointF(0.5f, 1.0f)
+                        scale = 0.3f
+                    }
+                )
+            }
+            isVisible = sharedPreferences.getBoolean(getString(R.string.quest1), false)
         }
-        placemark.useCompositeIcon().apply {
-            setIcon(
-                "pin",
-                ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
-                IconStyle().apply {
-                    anchor = PointF(0.5f, 1.0f)
-                    scale = 0.3f
-                }
+        placemark1 = collection.addPlacemark().apply {
+            geometry = Point(57.735604, 40.914032)
+            addTapListener(iconTapListen)
+
+            // Set text near the placemark with the custom TextStyle
+
+            setText(
+                "Смэрть",
+                TextStyle().apply {
+                    size = 10f
+                    placement = TextStyle.Placement.TOP
+                    offset = 1f
+                },
             )
+            useCompositeIcon().apply {
+                setIcon(
+                    "pin",
+                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
+                    IconStyle().apply {
+                        anchor = PointF(0.5f, 1.0f)
+                        scale = 0.3f
+                    }
+                )
+            }
+            isVisible = sharedPreferences.getBoolean(getString(R.string.quest2), false)
         }
+
     }
 
     private fun putUri() {
@@ -336,6 +429,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onResume() {
         super.onResume()
 
+
+
+
         accelerometer?.also { sensor ->
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
         }
@@ -347,6 +443,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             isFirstResume = false
             return
         }
+
+
+
     }
 
     private fun put() {
@@ -406,6 +505,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     @SuppressLint("ClickableViewAccessibility")
     fun click(view: View) {
+
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+//        val s = placemark1?.isVisible
+//        if (s != null) {
+//            updatePlacemarkVisibility(placemark1, !s)
+//        }
 ////        getLastKnownLocation()
 ////        put()
 //        video.visibility = View.VISIBLE
@@ -471,7 +578,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
-                    updateLocationOnMap(location)
+                    locationNow = Point(location.latitude, location.longitude)
+                    updateLocationOnMap(locationNow)
                 }
             }
         }
@@ -500,7 +608,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var isMarkerInitialized = false
 
     @SuppressLint("SuspiciousIndentation")
-    private fun updateLocationOnMap(location: Location) {
+    private fun updateLocationOnMap(location: Point) {
         val userLocation = Point(location.latitude, location.longitude)
         if (!isMarkerInitialized) {
             val map = mapView.mapWindow.map
@@ -529,6 +637,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
+            Log.d(TAG, "MoveCamera")
         }
     }
 
@@ -558,30 +667,30 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             )
             return
         }
-        CameraPosition()
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener(this) { location ->
-                if (location != null) {
-                    Log.d(TAG, "Latitude: ${location.latitude}, Longitude: ${location.longitude}")
-                    locationNow = Point(location.latitude, location.longitude)
-                    mapView.map.move(
-                        CameraPosition(
-                            locationNow,
-                            17.0f,
-                            azimuth,
-                            100.0f
-                        ),
-                        Animation(Animation.Type.SMOOTH, 3f), null
-                    )
-
-                    put()
-                } else {
-                    Log.d(TAG, "Last known location is null.")
-                }
-            }
-            .addOnFailureListener(this) { e ->
-                Log.e(TAG, "Error getting last known location", e)
-            }
+//        CameraPosition()
+//        fusedLocationClient.lastLocation
+//            .addOnSuccessListener(this) { location ->
+//                if (location != null) {
+//                    Log.d(TAG, "Latitude: ${location.latitude}, Longitude: ${location.longitude}")
+//                    locationNow = Point(location.latitude, location.longitude)
+//                    mapView.map.move(
+//                        CameraPosition(
+//                            locationNow,
+//                            17.0f,
+//                            azimuth,
+//                            100.0f
+//                        ),
+//                        Animation(Animation.Type.SMOOTH, 3f), null
+//                    )
+//
+//                    put()
+//                } else {
+//                    Log.d(TAG, "Last known location is null.")
+//                }
+//            }
+//            .addOnFailureListener(this) { e ->
+//                Log.e(TAG, "Error getting last known location", e)
+//            }
     }
 
 
