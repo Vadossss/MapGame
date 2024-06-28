@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:onClick="click"
         android:text="Button"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/videoCom"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,8 +72,8 @@
 
     <ImageView
         android:id="@+id/btnClose"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:backgroundTint="@color/black"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -82,6 +82,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/mapview"
         app:layout_constraintVertical_bias="0.078"
-        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+        app:srcCompat="@drawable/icon_close" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="quest1">
-        <item name="name">quest44444</item>
+    <string-array name="quest1.1">
+        <item name="name">quest1.1</item>
         <item name="text">Здесь ты найдёшь ларец</item>
-        <item name="enemy">Братки</item>
+        <item name="enemy">Противник: Братки</item>
+        <item name="next_quest">quest1.2</item>
+    </string-array>
+    <string-array name="quest1.2">
+        <item name="name">quest1.2</item>
+        <item name="text">А здесь сидит кощей. Одолей его и освободи что-то</item>
+        <item name="enemy">Противник: Кощей</item>
     </string-array>
 </resources>

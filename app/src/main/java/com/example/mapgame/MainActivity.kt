@@ -15,9 +15,6 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.JsonReader
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -57,13 +54,10 @@ import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
 
 
@@ -257,14 +251,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
     private fun checkPreferences() {
-        if (!sharedPreferences.contains(getString(R.string.quest1))) {
+        var questInfo = resources.getStringArray(R.array.quest1_1)
+        if (!sharedPreferences.contains(questInfo[0])) {
             val editor = sharedPreferences.edit()
-            editor.putBoolean(getString(R.string.quest1), true) // Установить изначальное значение для quest1
+            editor.putBoolean(questInfo[0], true) // Установить изначальное значение для quest1
             editor.apply()
         }
-        if (!sharedPreferences.contains(getString(R.string.quest2))) {
+        questInfo = resources.getStringArray(R.array.quest1_2)
+        if (!sharedPreferences.contains(questInfo[0])) {
             val editor = sharedPreferences.edit()
-            editor.putBoolean(getString(R.string.quest2), false) // Установить изначальное значение для quest1
+            editor.putBoolean(questInfo[0], false) // Установить изначальное значение для quest1
             editor.apply()
         }
 
@@ -284,15 +280,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onStop()
     }
 
-    private fun newDialog(name: String) {
-        val dialogInfo = resources.getStringArray(R.array.quest1)
+    private fun newDialog(nameQuest: Int, place: PlacemarkMapObject?) {
+        var questInfo = resources.getStringArray(nameQuest)
         val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
         val myDialog = Dialog(this)
-        val nameQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
+        val textQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
         myDialog.setContentView(dialogBinding)
         myDialog.setCancelable(true)
         myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        nameQuest.text = dialogInfo[1] + "\n" + dialogInfo[2]
+        textQuest.text = questInfo[1] + "\n" + questInfo[2]
         myDialog.show()
 
 
@@ -335,17 +331,25 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
 
             val editor = sharedPreferences.edit()
-            var currentState = sharedPreferences.getBoolean(getString(R.string.quest1), false)
-            editor.putBoolean(getString(R.string.quest1), !currentState)
+            var currentState = sharedPreferences.getBoolean(questInfo[0], false)
+            editor.putBoolean(questInfo[0], !currentState)
             editor.apply()
-            updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
-            Log.d(TAG, "QUEST1 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest1), false).toString())
+            updatePlacemarkVisibility(place, sharedPreferences.getBoolean(questInfo[0], false))
+            Log.d(TAG, "QUEST1 BOOL: " + sharedPreferences.getBoolean(questInfo[0], false).toString())
 
-            currentState = sharedPreferences.getBoolean(getString(R.string.quest2), false)
-            editor.putBoolean(getString(R.string.quest2), !currentState)
-            editor.apply()
-            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
-            Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
+            if (questInfo.size > 3) {
+                currentState = sharedPreferences.getBoolean(questInfo[3], false)
+                editor.putBoolean(getString(R.string.quest2), !currentState)
+                editor.apply()
+                updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(questInfo[3], false))
+                Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(questInfo[3], false).toString())
+            }
+
+//            currentState = sharedPreferences.getBoolean(getString(R.string.quest2), false)
+//            editor.putBoolean(getString(R.string.quest2), !currentState)
+//            editor.apply()
+//            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
+//            Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
 
 
         }
@@ -354,14 +358,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     @SuppressLint("ClickableViewAccessibility", "InflateParams")
     private val iconTapListen = MapObjectTapListener { _, _ ->
-        Toast.makeText(this, "Оно работает", Toast.LENGTH_SHORT).show()
-        newDialog("Здесь ты найдёшь ларец")
-
+        newDialog(R.array.quest1_1, placemark)
         true
     }
 
     private val iconTapListen2 = MapObjectTapListener { _, _ ->
-        newDialog("А тут кощей")
+        newDialog(R.array.quest1_2, placemark1)
         true
     }
     private var placemark : PlacemarkMapObject? = null
@@ -373,15 +375,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         placemark = collection.addPlacemark().apply {
             geometry = Point(57.736260, 40.921054)
             addTapListener(iconTapListen)
-
-            // Set text near the placemark with the custom TextStyle
-
             setText(
                 "Ларец",
                 TextStyle().apply {
-                    size = 10f
+                    size = 15f
                     placement = TextStyle.Placement.TOP
-                    offset = 1f
+                    color = Color.WHITE
                 },
             )
             useCompositeIcon().apply {
@@ -400,14 +399,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             geometry = Point(57.735604, 40.914032)
             addTapListener(iconTapListen2)
 
-            // Set text near the placemark with the custom TextStyle
-
             setText(
                 "Кощей",
                 TextStyle().apply {
-                    size = 10f
+                    size = 15f
                     placement = TextStyle.Placement.TOP
-                    offset = 1f
+                    color = Color.WHITE
+                    outlineColor = Color.BLACK
                 },
             )
             useCompositeIcon().apply {
@@ -554,6 +552,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
+
+        updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
+        updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
 //        val s = placemark1?.isVisible
 //        if (s != null) {
 //            updatePlacemarkVisibility(placemark1, !s)
@@ -633,8 +634,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         val locationRequest = LocationRequest.create().apply {
-            interval = 1000 // 10 секунд
-            fastestInterval = 1000 // 5 секунд
+            interval = 2000 // 10 секунд
+            fastestInterval = 2000 // 5 секунд
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         Log.d(TAG, "startLocationUpdates")
