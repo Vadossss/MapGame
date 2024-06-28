@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="quest1">
+        <item name="name">quest44444</item>
+        <item name="text">Здесь ты найдёшь ларец</item>
+        <item name="enemy">Братки</item>
+    </string-array>
+</resources>

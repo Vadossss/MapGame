@@ -131,45 +131,39 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return stringBuilder.toString()
     }
 
+    var flag : Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.setApiKey("204ee658-86b7-453b-90db-dd6a00cdc770")
         MapKitFactory.initialize(this)
         setContentView(R.layout.activity_main)
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-            return
-        }
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        getLastKnownLocation()
 
 
         mapView = findViewById(R.id.mapview)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mapView.map.isTiltGesturesEnabled = false
         mapView.map.isZoomGesturesEnabled = false
-
 
 
 
         val jsonStr = parseJsonInString("customization.json")
         mapView.map.isNightModeEnabled = true
         mapView.map.setMapStyle(jsonStr)
+
+        mapView.map.move(CameraPosition(
+            bottomRight, 17.0f, azimuth, 100f
+        ))
+
+
+
+
+
+
+
+
+        //getLastKnownLocation()
 
 
         video = findViewById(R.id.videoCom)
@@ -179,12 +173,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         btnPositionNow = findViewById(R.id.btnPositionNow)
         btnPositionNow.setOnClickListener {
             isCheckCameraPosition = true
+            Log.d(TAG, "")
             updateLocationOnMap(locationNow)
         }
 
 
 
-        startLocationUpdates()
+
 
         val map = mapView.mapWindow.map
 
@@ -237,6 +232,27 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         //sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
         //sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+            return
+        }
+
+
     }
 
 
@@ -251,6 +267,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             editor.putBoolean(getString(R.string.quest2), false) // Установить изначальное значение для quest1
             editor.apply()
         }
+
     }
 
 
@@ -268,14 +285,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun newDialog(name: String) {
+        val dialogInfo = resources.getStringArray(R.array.quest1)
         val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
         val myDialog = Dialog(this)
         val nameQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
         myDialog.setContentView(dialogBinding)
         myDialog.setCancelable(true)
         myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        nameQuest.text = name
+        nameQuest.text = dialogInfo[1] + "\n" + dialogInfo[2]
         myDialog.show()
+
+
 
         val btnClose = findViewById<ImageView>(R.id.btnClose)
         btnClose.setOnClickListener {
@@ -297,7 +317,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 layoutParams.height = d.layoutParams.height
                 video.layoutParams = layoutParams
             }
-
+            video.start()
             video.setOnCompletionListener {
                 video.stopPlayback()
                 video.visibility = View.INVISIBLE
@@ -313,6 +333,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
                 true
             }
+
             val editor = sharedPreferences.edit()
             var currentState = sharedPreferences.getBoolean(getString(R.string.quest1), false)
             editor.putBoolean(getString(R.string.quest1), !currentState)
@@ -326,7 +347,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
             Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
 
-            video.start()
+
         }
     }
 
@@ -334,8 +355,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     @SuppressLint("ClickableViewAccessibility", "InflateParams")
     private val iconTapListen = MapObjectTapListener { _, _ ->
         Toast.makeText(this, "Оно работает", Toast.LENGTH_SHORT).show()
-        newDialog("Это кощей")
+        newDialog("Здесь ты найдёшь ларец")
 
+        true
+    }
+
+    private val iconTapListen2 = MapObjectTapListener { _, _ ->
+        newDialog("А тут кощей")
         true
     }
     private var placemark : PlacemarkMapObject? = null
@@ -351,7 +377,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             // Set text near the placemark with the custom TextStyle
 
             setText(
-                "Смэрть",
+                "Ларец",
                 TextStyle().apply {
                     size = 10f
                     placement = TextStyle.Placement.TOP
@@ -372,12 +398,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
         placemark1 = collection.addPlacemark().apply {
             geometry = Point(57.735604, 40.914032)
-            addTapListener(iconTapListen)
+            addTapListener(iconTapListen2)
 
             // Set text near the placemark with the custom TextStyle
 
             setText(
-                "Смэрть",
+                "Кощей",
                 TextStyle().apply {
                     size = 10f
                     placement = TextStyle.Placement.TOP
@@ -386,7 +412,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             )
             useCompositeIcon().apply {
                 setIcon(
-                    "pin",
                     ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
                     IconStyle().apply {
                         anchor = PointF(0.5f, 1.0f)
@@ -435,6 +460,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED && !flag
+        ) {
+            startLocationUpdates()
+            flag = true
+        }
 
 
 
@@ -576,21 +614,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 //            fastestInterval = 1000 // 5 секунд
 //            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 //        }
-        val locationRequest = LocationRequest.create().apply {
-            interval = 100 // 10 секунд
-            fastestInterval = 100 // 5 секунд
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
-
-        val locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                for (location in locationResult.locations) {
-                    locationNow = Point(location.latitude, location.longitude)
-                    updateLocationOnMap(locationNow)
-                }
-            }
-        }
-
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -608,6 +631,24 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
+
+        val locationRequest = LocationRequest.create().apply {
+            interval = 1000 // 10 секунд
+            fastestInterval = 1000 // 5 секунд
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+        Log.d(TAG, "startLocationUpdates")
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    locationNow = Point(location.latitude, location.longitude)
+                    updateLocationOnMap(locationNow)
+                    Log.d(TAG, "startLocationUpdates222222")
+                }
+            }
+        }
+
+
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
@@ -671,32 +712,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         oldAzimuth = azimuth
     }
 
+    @SuppressLint("MissingPermission")
     private fun getLastKnownLocation() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-            return
-        }
+
         CameraPosition()
         fusedLocationClient.lastLocation
             .addOnSuccessListener(this) { location ->
@@ -712,8 +730,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         ),
                         //Animation(Animation.Type.SMOOTH, 3f), null
                     )
-
-                    put()
+//
+//                    put()
                 } else {
                     Log.d(TAG, "Last known location is null.")
                 }
