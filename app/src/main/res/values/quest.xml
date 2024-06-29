@@ -4,6 +4,15 @@
         <item name="quest1">@drawable/animad</item>
         <item name="quest2">@drawable/icon_kochei</item>
     </array>
+    <array name="quest1">
+        <item name="quest1">@array/quest1.1</item>
+        <item name="quest1">@array/quest1.2</item>
+    </array>
+    <array name="quest2">
+        <item name="quest1">@array/quest2.1</item>
+        <item name="quest1">@array/quest2.2</item>
+    </array>
+
     <string-array name="quest1.1">
         <item name="name">quest1.1</item>
         <item name="latitude">57.736260</item>

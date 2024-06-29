@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var quest1_2: NewQuest
     private lateinit var quest2_1: NewQuest
     private lateinit var quest2_2: NewQuest
+    private lateinit var quest1: Quest
+    private lateinit var quest2: Quest
 
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -182,16 +184,23 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         checkPreferences()
         val map = mapView.mapWindow.map
-        quest1_2 = NewQuest(this, map, R.array.quest1_2)
-        quest1_2.createNewQuest()
-        quest1_1 = NewQuest(this, map, R.array.quest1_1, quest1_2.placemark)
-        quest1_1.createNewQuest()
+//        quest1_2 = NewQuest(this, map, R.array.quest1_2)
+//        quest1_2.createNewQuest()
+//        quest1_1 = NewQuest(this, map, R.array.quest1_1, quest1_2.placemark)
+//        quest1_1.createNewQuest()
+//
+//        quest2_2 = NewQuest(this, map, R.array.quest2_2)
+//        quest2_2.createNewQuest()
+//
+//        quest2_1 = NewQuest(this, map, R.array.quest2_1, quest2_2.placemark)
+//        quest2_1.createNewQuest()
 
-        quest2_2 = NewQuest(this, map, R.array.quest2_2)
-        quest2_2.createNewQuest()
+        quest1 = Quest(this, map, R.array.quest1)
+        quest1.createQuest()
 
-        quest2_1 = NewQuest(this, map, R.array.quest2_1, quest2_2.placemark)
-        quest2_1.createNewQuest()
+
+        quest2 = Quest(this, map, R.array.quest2)
+        quest2.createQuest()
 
 
 
