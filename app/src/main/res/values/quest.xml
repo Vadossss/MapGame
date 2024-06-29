@@ -2,13 +2,20 @@
 <resources>
     <string-array name="quest1.1">
         <item name="name">quest1.1</item>
+        <item name="latitude">57.736260</item>
+        <item name="longitude">40.921054</item>
+        <item name="location_name">КГУ</item>
         <item name="text">Здесь ты найдёшь ларец</item>
-        <item name="enemy">Противник: Братки</item>
         <item name="next_quest">quest1.2</item>
+        <item name="enemy">Противник: Братки</item>
     </string-array>
     <string-array name="quest1.2">
         <item name="name">quest1.2</item>
+        <item name="latitude">57.736260</item>
+        <item name="longitude">40.921054</item>
+        <item name="location_name">КГУ школа</item>
         <item name="text">А здесь сидит кощей. Одолей его и освободи что-то</item>
+        <item name="next_quest"></item>
         <item name="enemy">Противник: Кощей</item>
     </string-array>
 </resources>

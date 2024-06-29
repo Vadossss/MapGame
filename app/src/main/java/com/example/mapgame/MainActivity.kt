@@ -46,7 +46,6 @@ import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.RotationType
-import com.yandex.mapkit.map.TextStyle
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.navigation.automotive.NavigationFactory
 import com.yandex.mapkit.navigation.automotive.NavigationListener
@@ -71,12 +70,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private val r = FloatArray(9)
     private val i = FloatArray(9)
     private var azimuth: Float = 0f
+    private lateinit var quest: NewQuest
 
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mapView: MapView
     private lateinit var locationNow: Point
-    var uri: Uri =
+    private var uri: Uri =
         Uri.parse("yandexnavi://build_route_on_map?lat_from=57.732670&lon_from=40.912260&lat_to=55.76&lon_to=37.64")
 
 
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return stringBuilder.toString()
     }
 
-    var flag : Boolean = false
+    private var checkCompliteGPS : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -174,14 +174,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
 
-
-        val map = mapView.mapWindow.map
-
-
         sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 
 
         checkPreferences()
+        val map = mapView.mapWindow.map
+        val quest1_2 = NewQuest(this, map, R.array.quest1_2)
+        quest1_2.createNewQuest()
+        quest = NewQuest(this, map, R.array.quest1_1, quest1_2.placemark)
+        quest.createNewQuest()
+
+
 
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
@@ -304,7 +307,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         btnBattle.setOnClickListener {
             myDialog.dismiss()
             video.visibility = View.VISIBLE
-            video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video1)
+            video.setVideoPath("android.resource://" + packageName + "/" + R.raw.video1)
 
             video.setOnPreparedListener {
                 val layoutParams = video.layoutParams
@@ -319,6 +322,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 video.visibility = View.INVISIBLE
                 btnClose.visibility = View.INVISIBLE
             }
+
+
 
             video.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
@@ -368,57 +373,58 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
     private var placemark : PlacemarkMapObject? = null
     private var placemark1 : PlacemarkMapObject? = null
-    fun allIcon() {
+
+    private fun allIcon() {
         val map = mapView.mapWindow.map
         collection = map.mapObjects.addCollection()
 
-        placemark = collection.addPlacemark().apply {
-            geometry = Point(57.736260, 40.921054)
-            addTapListener(iconTapListen)
-            setText(
-                "Ларец",
-                TextStyle().apply {
-                    size = 15f
-                    placement = TextStyle.Placement.TOP
-                    color = Color.WHITE
-                },
-            )
-            useCompositeIcon().apply {
-                setIcon(
-                    "pin",
-                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
-                    IconStyle().apply {
-                        anchor = PointF(0.5f, 1.0f)
-                        scale = 0.3f
-                    }
-                )
-            }
-            isVisible = sharedPreferences.getBoolean(getString(R.string.quest1), false)
-        }
-        placemark1 = collection.addPlacemark().apply {
-            geometry = Point(57.735604, 40.914032)
-            addTapListener(iconTapListen2)
-
-            setText(
-                "Кощей",
-                TextStyle().apply {
-                    size = 15f
-                    placement = TextStyle.Placement.TOP
-                    color = Color.WHITE
-                    outlineColor = Color.BLACK
-                },
-            )
-            useCompositeIcon().apply {
-                setIcon(
-                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
-                    IconStyle().apply {
-                        anchor = PointF(0.5f, 1.0f)
-                        scale = 0.3f
-                    }
-                )
-            }
-            isVisible = sharedPreferences.getBoolean(getString(R.string.quest2), false)
-        }
+//        placemark = collection.addPlacemark().apply {
+//            geometry = Point(57.736260, 40.921054)
+//            addTapListener(iconTapListen)
+//            setText(
+//                "Ларец",
+//                TextStyle().apply {
+//                    size = 15f
+//                    placement = TextStyle.Placement.TOP
+//                    color = Color.WHITE
+//                },
+//            )
+//            useCompositeIcon().apply {
+//                setIcon(
+//                    "pin",
+//                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
+//                    IconStyle().apply {
+//                        anchor = PointF(0.5f, 1.0f)
+//                        scale = 0.3f
+//                    }
+//                )
+//            }
+//            isVisible = sharedPreferences.getBoolean(getString(R.string.quest1), false)
+//        }
+//        placemark1 = collection.addPlacemark().apply {
+//            geometry = Point(57.735604, 40.914032)
+//            addTapListener(iconTapListen2)
+//
+//            setText(
+//                "Кощей",
+//                TextStyle().apply {
+//                    size = 15f
+//                    placement = TextStyle.Placement.TOP
+//                    color = Color.WHITE
+//                    outlineColor = Color.BLACK
+//                },
+//            )
+//            useCompositeIcon().apply {
+//                setIcon(
+//                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
+//                    IconStyle().apply {
+//                        anchor = PointF(0.5f, 1.0f)
+//                        scale = 0.3f
+//                    }
+//                )
+//            }
+//            isVisible = sharedPreferences.getBoolean(getString(R.string.quest2), false)
+//        }
 
     }
 
@@ -466,10 +472,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED && !flag
+            ) == PackageManager.PERMISSION_GRANTED && !checkCompliteGPS
         ) {
             startLocationUpdates()
-            flag = true
+            checkCompliteGPS = true
         }
 
 
@@ -522,7 +528,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             override fun onRoutesBuilt() {
                 val routes = navigation.routes
                 val fastestRoute = routes[0]
-                Log.d(TAG, "Маршрут " + fastestRoute.toString())
+                Log.d(TAG, "Маршрут $fastestRoute")
                 // Routes received successfully ...
             }
 
