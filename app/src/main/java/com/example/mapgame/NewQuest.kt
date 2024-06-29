@@ -1,5 +1,6 @@
 package com.example.mapgame
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.ContentValues.TAG
@@ -39,6 +40,8 @@ class NewQuest {
     private var locationName: String
     private var questText: String
     private var questNext: String
+    private var icondIndex: Int
+
 
 
     private lateinit var collection: MapObjectCollection
@@ -54,6 +57,7 @@ class NewQuest {
         locationName = questInfo[3]
         questText = questInfo[4]
         questNext = questInfo[5]
+        icondIndex = questInfo[6].toInt()
     }
 
     constructor(context: Context, map: Map, nameQuest: Int, placemarkNext: PlacemarkMapObject) {
@@ -68,13 +72,13 @@ class NewQuest {
         locationName = questInfo[3]
         questText = questInfo[4]
         questNext = questInfo[5]
+        icondIndex = questInfo[6].toInt()
     }
 
 
     private val iconTapListen = MapObjectTapListener { _, _ ->
         newDialog()
-        true
-
+        false
     }
 
     private fun updatePlacemarkVisibility(placemark: PlacemarkMapObject?, isVisible: Boolean) {
@@ -82,6 +86,12 @@ class NewQuest {
     }
 
     fun createNewQuest() {
+        val icons = context.resources.obtainTypedArray(R.array.icons)
+        val selectedIconResId = icons.getResourceId(icondIndex, -1)
+
+//        val iconIndex = (0 until icons.length()).random()
+//        val selectedIconResId = icons.getResourceId(iconIndex, -1)
+
         collection = map.mapObjects.addCollection()
         placemark = collection.addPlacemark().apply {
             geometry = questLocation
@@ -96,7 +106,7 @@ class NewQuest {
             )
             useCompositeIcon().apply {
                 setIcon(
-                    ImageProvider.fromResource(context, R.drawable.animad),
+                    ImageProvider.fromResource(context, selectedIconResId),
                     IconStyle().apply {
                         anchor = PointF(0.5f, 1.0f)
                         scale = 0.3f
@@ -108,6 +118,7 @@ class NewQuest {
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun newDialog() {
         val dialogBinding = LayoutInflater.from(context).inflate(R.layout.dialog_enemy, null)
         val mainActiv = context as Activity
@@ -153,13 +164,12 @@ class NewQuest {
 
 
 
-            video.setOnTouchListener { v, event ->
+            video.setOnTouchListener {_, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     if (btnClose.visibility == View.INVISIBLE)
                         btnClose.visibility = View.VISIBLE
                     else
                         btnClose.visibility = View.INVISIBLE
-                    v.performClick()
                 }
                 true
             }

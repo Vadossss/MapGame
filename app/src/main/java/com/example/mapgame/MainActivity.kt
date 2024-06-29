@@ -70,7 +70,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private val r = FloatArray(9)
     private val i = FloatArray(9)
     private var azimuth: Float = 0f
-    private lateinit var quest: NewQuest
+    private lateinit var quest1_1: NewQuest
+    private lateinit var quest1_2: NewQuest
+    private lateinit var quest2_1: NewQuest
+    private lateinit var quest2_2: NewQuest
 
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -179,10 +182,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         checkPreferences()
         val map = mapView.mapWindow.map
-        val quest1_2 = NewQuest(this, map, R.array.quest1_2)
+        quest1_2 = NewQuest(this, map, R.array.quest1_2)
         quest1_2.createNewQuest()
-        quest = NewQuest(this, map, R.array.quest1_1, quest1_2.placemark)
-        quest.createNewQuest()
+        quest1_1 = NewQuest(this, map, R.array.quest1_1, quest1_2.placemark)
+        quest1_1.createNewQuest()
+
+        quest2_2 = NewQuest(this, map, R.array.quest2_2)
+        quest2_2.createNewQuest()
+
+        quest2_1 = NewQuest(this, map, R.array.quest2_1, quest2_2.placemark)
+        quest2_1.createNewQuest()
 
 
 
@@ -261,6 +270,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             editor.apply()
         }
         questInfo = resources.getStringArray(R.array.quest1_2)
+        if (!sharedPreferences.contains(questInfo[0])) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean(questInfo[0], false) // Установить изначальное значение для quest1
+            editor.apply()
+        }
+        questInfo = resources.getStringArray(R.array.quest2_1)
+        if (!sharedPreferences.contains(questInfo[0])) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean(questInfo[0], true) // Установить изначальное значение для quest1
+            editor.apply()
+        }
+        questInfo = resources.getStringArray(R.array.quest2_2)
         if (!sharedPreferences.contains(questInfo[0])) {
             val editor = sharedPreferences.edit()
             editor.putBoolean(questInfo[0], false) // Установить изначальное значение для quest1
