@@ -40,11 +40,21 @@ class NewQuest {
     private var locationName: String
     private var questText: String
     private var questNext: String
-    private var icondIndex: Int
+    private var iconIndex: Int
+    private var questVisible: Boolean
+
 
 
 
     private lateinit var collection: MapObjectCollection
+
+
+    fun getQuestName(): String {
+        return questName
+    }
+    fun getVisible(): Boolean {
+        return questVisible
+    }
 
     constructor(context: Context, map: Map, nameQuest: Int) {
         this.map = map
@@ -57,7 +67,8 @@ class NewQuest {
         locationName = questInfo[3]
         questText = questInfo[4]
         questNext = questInfo[5]
-        icondIndex = questInfo[6].toInt()
+        iconIndex = questInfo[6].toInt()
+        questVisible = questInfo[7].toBoolean()
     }
 
     constructor(context: Context, map: Map, nameQuest: Int, placemarkNext: PlacemarkMapObject) {
@@ -72,7 +83,8 @@ class NewQuest {
         locationName = questInfo[3]
         questText = questInfo[4]
         questNext = questInfo[5]
-        icondIndex = questInfo[6].toInt()
+        iconIndex = questInfo[6].toInt()
+        questVisible = questInfo[7].toBoolean()
     }
 
 
@@ -81,39 +93,41 @@ class NewQuest {
         false
     }
 
-    private fun updatePlacemarkVisibility(placemark: PlacemarkMapObject?, isVisible: Boolean) {
+    fun updatePlacemarkVisibility(placemark: PlacemarkMapObject?, isVisible: Boolean) {
         placemark?.isVisible = isVisible
     }
 
+
     fun createNewQuest() {
         val icons = context.resources.obtainTypedArray(R.array.icons)
-        val selectedIconResId = icons.getResourceId(icondIndex, -1)
+        try {
+            val selectedIconResId = icons.getResourceId(iconIndex, -1)
 
-//        val iconIndex = (0 until icons.length()).random()
-//        val selectedIconResId = icons.getResourceId(iconIndex, -1)
-
-        collection = map.mapObjects.addCollection()
-        placemark = collection.addPlacemark().apply {
-            geometry = questLocation
-            addTapListener(iconTapListen)
-            setText(
-                locationName,
-                TextStyle().apply {
-                    size = 15f
-                    placement = TextStyle.Placement.TOP
-                    color = Color.WHITE
-                },
-            )
-            useCompositeIcon().apply {
-                setIcon(
-                    ImageProvider.fromResource(context, selectedIconResId),
-                    IconStyle().apply {
-                        anchor = PointF(0.5f, 1.0f)
-                        scale = 0.3f
-                    }
+            collection = map.mapObjects.addCollection()
+            placemark = collection.addPlacemark().apply {
+                geometry = questLocation
+                addTapListener(iconTapListen)
+                setText(
+                    locationName,
+                    TextStyle().apply {
+                        size = 15f
+                        placement = TextStyle.Placement.TOP
+                        color = Color.WHITE
+                    },
                 )
+                useCompositeIcon().apply {
+                    setIcon(
+                        ImageProvider.fromResource(context, selectedIconResId),
+                        IconStyle().apply {
+                            anchor = PointF(0.5f, 1.0f)
+                            scale = 0.3f
+                        }
+                    )
+                }
+                isVisible = sharedPreferences.getBoolean(questName, false)
             }
-            isVisible = sharedPreferences.getBoolean(questName, false)
+        } finally {
+            icons.recycle()
         }
     }
 

@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 
 
-        checkPreferences()
+        //checkPreferences()
         val map = mapView.mapWindow.map
 //        quest1_2 = NewQuest(this, map, R.array.quest1_2)
 //        quest1_2.createNewQuest()
@@ -195,12 +195,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 //        quest2_1 = NewQuest(this, map, R.array.quest2_1, quest2_2.placemark)
 //        quest2_1.createNewQuest()
 
-        quest1 = Quest(this, map, R.array.quest1)
-        quest1.createQuest()
+        quest1 = Quest(this, map, R.array.all_quest)
+        quest1.initQuest()
 
 
-        quest2 = Quest(this, map, R.array.quest2)
-        quest2.createQuest()
+//        quest2 = Quest(this, map, R.array.quest2)
+//        quest2.createQuest()
 
 
 
@@ -588,9 +588,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
-
-        updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
-        updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
+        quest1.resetQuests()
+//        updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
+//        updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
 //        val s = placemark1?.isVisible
 //        if (s != null) {
 //            updatePlacemarkVisibility(placemark1, !s)

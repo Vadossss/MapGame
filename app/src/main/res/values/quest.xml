@@ -4,13 +4,19 @@
         <item name="quest1">@drawable/animad</item>
         <item name="quest2">@drawable/icon_kochei</item>
     </array>
+
+    <array name="all_quest">
+        <item name="quest1">@array/quest1</item>
+        <item name="quest2">@array/quest2</item>
+    </array>
+
     <array name="quest1">
-        <item name="quest1">@array/quest1.1</item>
-        <item name="quest1">@array/quest1.2</item>
+        <item name="quest1_1">@array/quest1.1</item>
+        <item name="quest1_2">@array/quest1.2</item>
     </array>
     <array name="quest2">
-        <item name="quest1">@array/quest2.1</item>
-        <item name="quest1">@array/quest2.2</item>
+        <item name="quest2_1">@array/quest2.1</item>
+        <item name="quest2_2">@array/quest2.2</item>
     </array>
 
     <string-array name="quest1.1">
@@ -21,6 +27,7 @@
         <item name="text">Здесь ты найдёшь ларец</item>
         <item name="next_quest">quest1.2</item>
         <item name="icon_path">0</item>
+        <item name="visible">true</item>
         <item name="enemy">Противник: Братки</item>
     </string-array>
     <string-array name="quest1.2">
@@ -31,6 +38,7 @@
         <item name="text">А здесь сидит кощей. Одолей его и освободи что-то</item>
         <item name="next_quest"></item>
         <item name="icon_path">0</item>
+        <item name="visible">false</item>
         <item name="enemy">Противник: Кощей</item>
     </string-array>
     <string-array name="quest2.1">
@@ -41,6 +49,7 @@
         <item name="text">Здесь ты рос</item>
         <item name="next_quest">quest2.2</item>
         <item name="icon_path">1</item>
+        <item name="visible">true</item>
         <item name="enemy">Противник: Братки</item>
     </string-array>
     <string-array name="quest2.2">
@@ -51,6 +60,7 @@
         <item name="text">А здесь ты покупал пиво</item>
         <item name="next_quest"></item>
         <item name="icon_path">1</item>
+        <item name="visible">false</item>
         <item name="enemy">Противник: Кощей</item>
     </string-array>
 </resources>
