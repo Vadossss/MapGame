@@ -10,9 +10,11 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -25,12 +27,17 @@ import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.TextStyle
 import com.yandex.runtime.image.ImageProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 class NewQuest {
     private var map: Map
     private var nameQuest: Int = 0
     lateinit var placemark: PlacemarkMapObject
-    private lateinit var placemarkNext: PlacemarkMapObject
+    private var placemarkNext: NewQuest? = null
     private var context: Context
     private var sharedPreferences: SharedPreferences
     private var questInfo: Array<String>
@@ -39,10 +46,9 @@ class NewQuest {
     private var questLocation: Point
     private var locationName: String
     private var questText: String
-    private var questNext: String
+//    private var questNext: String
     private var iconIndex: Int
     private var questVisible: Boolean
-
 
 
 
@@ -66,12 +72,12 @@ class NewQuest {
         questLocation = Point(questInfo[1].toDouble(), questInfo[2].toDouble())
         locationName = questInfo[3]
         questText = questInfo[4]
-        questNext = questInfo[5]
+//        questNext = questInfo[5]
         iconIndex = questInfo[6].toInt()
         questVisible = questInfo[7].toBoolean()
     }
 
-    constructor(context: Context, map: Map, nameQuest: Int, placemarkNext: PlacemarkMapObject) {
+    constructor(context: Context, map: Map, nameQuest: Int, placemarkNext: NewQuest) {
         this.map = map
         this.nameQuest = nameQuest
         this.context = context
@@ -82,7 +88,7 @@ class NewQuest {
         questLocation = Point(questInfo[1].toDouble(), questInfo[2].toDouble())
         locationName = questInfo[3]
         questText = questInfo[4]
-        questNext = questInfo[5]
+//        questNext = questInfo[5]
         iconIndex = questInfo[6].toInt()
         questVisible = questInfo[7].toBoolean()
     }
@@ -124,7 +130,7 @@ class NewQuest {
                         }
                     )
                 }
-                isVisible = sharedPreferences.getBoolean(questName, false)
+                isVisible = sharedPreferences.getBoolean(questName+"Visible", false)
             }
         } finally {
             icons.recycle()
@@ -174,6 +180,7 @@ class NewQuest {
                 video.stopPlayback()
                 video.visibility = View.INVISIBLE
                 btnClose.visibility = View.INVISIBLE
+                achievementWindow()
             }
 
 
@@ -189,33 +196,61 @@ class NewQuest {
             }
 
             val editor = sharedPreferences.edit()
-            var currentState = sharedPreferences.getBoolean(questName, false)
-            editor.putBoolean(questName, !currentState)
+            //val currentState = sharedPreferences.getBoolean(questName, false)
+            editor.putBoolean(questName, true)
+            editor.putBoolean(questName+"Visible", false)
+            Log.d(TAG, "Questname: "+sharedPreferences.getBoolean(questName+"Visible", false).toString())
+            updatePlacemarkVisibility(placemark, false)
+
+
+            /*placemark может быть null, в таком случае ничего не произойдёт*/
+            updatePlacemarkVisibility(placemarkNext?.placemark, true)
+            editor.putBoolean(placemarkNext?.getQuestName() + "Visible", true)
+            Log.d(
+                TAG,
+                "QuestnameNext: " + sharedPreferences.getBoolean(
+                    placemarkNext?.getQuestName() + "Visible",
+                    false
+                ).toString()
+            )
             editor.apply()
-            updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(questName, false))
-            Log.d(TAG, "QUEST1 BOOL: " + sharedPreferences.getBoolean(questName, false).toString())
-
-            if (questNext.isNotBlank()) {
-                currentState = sharedPreferences.getBoolean(questNext, false)
-                editor.putBoolean(questNext, !currentState)
-                editor.apply()
-                val s = collection.parent
-                Log.d(TAG, s.toString())
-                updatePlacemarkVisibility(placemarkNext, sharedPreferences.getBoolean(questNext, false))
-                Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(questNext, false).toString())
-            }
-
-//            currentState = sharedPreferences.getBoolean(getString(R.string.quest2), false)
-//            editor.putBoolean(getString(R.string.quest2), !currentState)
-//            editor.apply()
-//            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
-//            Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
-
 
         }
     }
 
+    private fun achievementWindow() {
+        val achievementWindow = LayoutInflater.from(context).inflate(R.layout.achievement_window, null)
+        val myDialog = Dialog(context)
+        val nameAchievement = achievementWindow.findViewById<TextView>(R.id.achieveName)
+        val textAchievement = achievementWindow.findViewById<TextView>(R.id.achieveText)
+        myDialog.setContentView(achievementWindow)
+        myDialog.setCancelable(false)
+        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.BLACK))
+        myDialog.window?.setDimAmount(0F)
 
+        myDialog.window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
+        myDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        myDialog.window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
 
+        nameAchievement.text = questInfo[8]
+        textAchievement.text = questInfo[9]
+        val params= myDialog.window?.attributes
+        params?.gravity = Gravity.TOP
+        params?.y = 50
+        myDialog.show()
 
+        myDialog.window?.decorView?.post {
+            myDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+        }
+
+        val coroutineScope = CoroutineScope(Dispatchers.Main)
+        coroutineScope.launch {
+            doWork()
+            myDialog.dismiss()
+        }
+    }
+
+    private suspend fun doWork(){
+            delay(4000)
+    }
 }

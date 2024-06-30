@@ -16,10 +16,9 @@ import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.VideoView
@@ -43,7 +42,6 @@ import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
-import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.RotationType
 import com.yandex.mapkit.mapview.MapView
@@ -74,7 +72,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var quest1_2: NewQuest
     private lateinit var quest2_1: NewQuest
     private lateinit var quest2_2: NewQuest
-    private lateinit var quest1: Quest
+    private lateinit var quest: Quest
     private lateinit var quest2: Quest
 
 
@@ -103,18 +101,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var cameraList : CameraListener
 
-    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-        if (key == getString(R.string.quest1)) {
-            updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(key, false))
-            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(key, false))
-        }
-    }
 
-    private fun updatePlacemarkVisibility(placemark: PlacemarkMapObject?, isVisible: Boolean) {
-        placemark?.isVisible = isVisible
-    }
 
-    private fun parseJsonInString(name : String): String {
+
+    private fun parseJsonInString(name: String): String {
         val stringBuilder = StringBuilder()
         val inputStream = this.assets.open(name)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream))
@@ -195,8 +185,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 //        quest2_1 = NewQuest(this, map, R.array.quest2_1, quest2_2.placemark)
 //        quest2_1.createNewQuest()
 
-        quest1 = Quest(this, map, R.array.all_quest)
-        quest1.initQuest()
+        quest = Quest(this, map, R.array.all_quest)
+        quest.initQuest()
+        //Log.d(TAG, "SharedPrefInfo: " + sharedPreferences.getBoolean("quest1.2Visible", false))
 
 
 //        quest2 = Quest(this, map, R.array.quest2)
@@ -313,98 +304,100 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onStop()
     }
 
-    private fun newDialog(nameQuest: Int, place: PlacemarkMapObject?) {
-        var questInfo = resources.getStringArray(nameQuest)
-        val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
-        val myDialog = Dialog(this)
-        val textQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
-        myDialog.setContentView(dialogBinding)
-        myDialog.setCancelable(true)
-        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        textQuest.text = questInfo[1] + "\n" + questInfo[2]
-        myDialog.show()
-
-
-
-        val btnClose = findViewById<ImageView>(R.id.btnClose)
-        btnClose.setOnClickListener {
-            video.stopPlayback()
-            video.visibility = View.INVISIBLE
-            btnClose.visibility = View.INVISIBLE
-        }
-
-        val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
-        btnBattle.setOnClickListener {
-            myDialog.dismiss()
-            video.visibility = View.VISIBLE
-            video.setVideoPath("android.resource://" + packageName + "/" + R.raw.video1)
-
-            video.setOnPreparedListener {
-                val layoutParams = video.layoutParams
-                val d = findViewById<View>(R.id.lay)
-                layoutParams.width = d.layoutParams.width
-                layoutParams.height = d.layoutParams.height
-                video.layoutParams = layoutParams
-            }
-            video.start()
-            video.setOnCompletionListener {
-                video.stopPlayback()
-                video.visibility = View.INVISIBLE
-                btnClose.visibility = View.INVISIBLE
-            }
-
-
-
-            video.setOnTouchListener { _, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    if (btnClose.visibility == View.INVISIBLE)
-                        btnClose.visibility = View.VISIBLE
-                    else
-                        btnClose.visibility = View.INVISIBLE
-                }
-                true
-            }
-
-            val editor = sharedPreferences.edit()
-            var currentState = sharedPreferences.getBoolean(questInfo[0], false)
-            editor.putBoolean(questInfo[0], !currentState)
-            editor.apply()
-            updatePlacemarkVisibility(place, sharedPreferences.getBoolean(questInfo[0], false))
-            Log.d(TAG, "QUEST1 BOOL: " + sharedPreferences.getBoolean(questInfo[0], false).toString())
-
-            if (questInfo.size > 3) {
-                currentState = sharedPreferences.getBoolean(questInfo[3], false)
-                editor.putBoolean(getString(R.string.quest2), !currentState)
-                editor.apply()
-                updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(questInfo[3], false))
-                Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(questInfo[3], false).toString())
-            }
-
-//            currentState = sharedPreferences.getBoolean(getString(R.string.quest2), false)
-//            editor.putBoolean(getString(R.string.quest2), !currentState)
+//    private fun newDialog(nameQuest: Int, place: PlacemarkMapObject?) {
+//        var questInfo = resources.getStringArray(nameQuest)
+//        val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
+//        val myDialog = Dialog(this)
+//        val textQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
+//        myDialog.setContentView(dialogBinding)
+//        myDialog.setCancelable(true)
+//        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//        textQuest.text = questInfo[1] + "\n" + questInfo[2]
+//        myDialog.show()
+//
+//
+//
+//        val btnClose = findViewById<ImageView>(R.id.btnClose)
+//        btnClose.setOnClickListener {
+//            video.stopPlayback()
+//            video.visibility = View.INVISIBLE
+//            btnClose.visibility = View.INVISIBLE
+//        }
+//
+//        val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
+//        btnBattle.setOnClickListener {
+//            myDialog.dismiss()
+//            video.visibility = View.VISIBLE
+//            video.setVideoPath("android.resource://" + packageName + "/" + R.raw.video1)
+//
+//            video.setOnPreparedListener {
+//                val layoutParams = video.layoutParams
+//                val d = findViewById<View>(R.id.lay)
+//                layoutParams.width = d.layoutParams.width
+//                layoutParams.height = d.layoutParams.height
+//                video.layoutParams = layoutParams
+//            }
+//            video.start()
+//            video.setOnCompletionListener {
+//                video.stopPlayback()
+//                video.visibility = View.INVISIBLE
+//                btnClose.visibility = View.INVISIBLE
+//            }
+//
+//
+//
+//            video.setOnTouchListener { _, event ->
+//                if (event.action == MotionEvent.ACTION_DOWN) {
+//                    if (btnClose.visibility == View.INVISIBLE)
+//                        btnClose.visibility = View.VISIBLE
+//                    else
+//                        btnClose.visibility = View.INVISIBLE
+//                }
+//                true
+//            }
+//
+//            val editor = sharedPreferences.edit()
+//            var currentState = sharedPreferences.getBoolean(questInfo[0], false)
+//            editor.putBoolean(questInfo[0], !currentState)
 //            editor.apply()
-//            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
-//            Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
+//            updatePlacemarkVisibility(place, sharedPreferences.getBoolean(questInfo[0], false))
+//            Log.d(TAG, "QUEST1 BOOL: " + sharedPreferences.getBoolean(questInfo[0], false).toString())
+//
+//            if (questInfo.size > 3) {
+//                currentState = sharedPreferences.getBoolean(questInfo[3], false)
+//                editor.putBoolean(getString(R.string.quest2), !currentState)
+//                editor.apply()
+//                updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(questInfo[3], false))
+//                Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(questInfo[3], false).toString())
+//            }
+//
+////            currentState = sharedPreferences.getBoolean(getString(R.string.quest2), false)
+////            editor.putBoolean(getString(R.string.quest2), !currentState)
+////            editor.apply()
+////            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
+////            Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
+//
+//
+//        }
+//    }
 
 
-        }
-    }
+//    @SuppressLint("ClickableViewAccessibility", "InflateParams")
+//    private val iconTapListen = MapObjectTapListener { _, _ ->
+//        newDialog(R.array.quest1_1, placemark)
+//        true
+//    }
+//
+//    private val iconTapListen2 = MapObjectTapListener { _, _ ->
+//        newDialog(R.array.quest1_2, placemark1)
+//        true
+//    }
+//    private var placemark : PlacemarkMapObject? = null
+//    private var placemark1 : PlacemarkMapObject? = null
 
 
-    @SuppressLint("ClickableViewAccessibility", "InflateParams")
-    private val iconTapListen = MapObjectTapListener { _, _ ->
-        newDialog(R.array.quest1_1, placemark)
-        true
-    }
 
-    private val iconTapListen2 = MapObjectTapListener { _, _ ->
-        newDialog(R.array.quest1_2, placemark1)
-        true
-    }
-    private var placemark : PlacemarkMapObject? = null
-    private var placemark1 : PlacemarkMapObject? = null
-
-    private fun allIcon() {
+    fun allIcon() {
         val map = mapView.mapWindow.map
         collection = map.mapObjects.addCollection()
 
@@ -588,7 +581,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
-        quest1.resetQuests()
+        quest.resetQuests()
 //        updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
 //        updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
 //        val s = placemark1?.isVisible

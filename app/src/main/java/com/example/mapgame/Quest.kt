@@ -11,6 +11,7 @@ class Quest(private var context: Context, private var map: Map, private var allQ
         context.getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 
 
+
     fun initQuest() {
         val info = context.resources.obtainTypedArray(allQuest)
         try {
@@ -26,7 +27,12 @@ class Quest(private var context: Context, private var map: Map, private var allQ
         val questInfo = context.resources.getStringArray(nameQuest)
         if (!sharedPreferences.contains(questInfo[0])) {
             val editor = sharedPreferences.edit()
-            editor.putBoolean(questInfo[0], questInfo[7].toBoolean())
+            editor.putBoolean(questInfo[0], false)
+            editor.apply()
+        }
+        if (!sharedPreferences.contains(questInfo[0]+"Visible")) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean(questInfo[0]+"Visible", questInfo[7].toBoolean())
             editor.apply()
         }
     }
@@ -49,7 +55,7 @@ class Quest(private var context: Context, private var map: Map, private var allQ
                     quest.createNewQuest()
                     questList.add(quest)
                 } else {
-                    quest = NewQuest(context, map, nameQuest, questList.last().placemark)
+                    quest = NewQuest(context, map, nameQuest, questList.last())
                     quest.createNewQuest()
                     questList.add(quest)
                 }
@@ -63,7 +69,7 @@ class Quest(private var context: Context, private var map: Map, private var allQ
     fun resetQuests() {
         val editor = sharedPreferences.edit()
         questList.flatten().forEach { quest ->
-            editor.putBoolean(quest.getQuestName(), quest.getVisible())
+            editor.putBoolean(quest.getQuestName()+"Visible", quest.getVisible())
         }
         editor.apply()
         updateQuestVisibility()

@@ -28,6 +28,8 @@
         <item name="next_quest">quest1.2</item>
         <item name="icon_path">0</item>
         <item name="visible">true</item>
+        <item name="achievement_name">Большая сила в руках</item>
+        <item name="achievement_text">Найти ларец с иголкой</item>
         <item name="enemy">Противник: Братки</item>
     </string-array>
     <string-array name="quest1.2">
@@ -39,6 +41,8 @@
         <item name="next_quest"></item>
         <item name="icon_path">0</item>
         <item name="visible">false</item>
+        <item name="achievement_name">Большая сила в руках</item>
+        <item name="achievement_text">Найти ларец с иголкой</item>
         <item name="enemy">Противник: Кощей</item>
     </string-array>
     <string-array name="quest2.1">
@@ -50,6 +54,8 @@
         <item name="next_quest">quest2.2</item>
         <item name="icon_path">1</item>
         <item name="visible">true</item>
+        <item name="achievement_name">Большая сила в руках</item>
+        <item name="achievement_text">Найти ларец с иголкой</item>
         <item name="enemy">Противник: Братки</item>
     </string-array>
     <string-array name="quest2.2">
@@ -61,6 +67,8 @@
         <item name="next_quest"></item>
         <item name="icon_path">1</item>
         <item name="visible">false</item>
+        <item name="achievement_name">Большая сила в руках</item>
+        <item name="achievement_text">Найти ларец с иголкой</item>
         <item name="enemy">Противник: Кощей</item>
     </string-array>
 </resources>
