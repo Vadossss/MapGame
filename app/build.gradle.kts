@@ -50,4 +50,5 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.yandex.mapkit.styling:automotivenavigation:4.6.1")
     implementation("com.yandex.mapkit.styling:roadevents:4.6.1")
+    implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
 }

@@ -294,7 +294,7 @@ class NewQuest {
         textQuest.text = questText
         myDialog.show()
 
-        val intent = Intent(context, ARActivity::class.java)
+        val intent = Intent(context, ArActivity::class.java)
         val btnClose = mainActiv.findViewById<ImageView>(R.id.btnClose)
         btnClose.setOnClickListener {
             video.stopPlayback()
