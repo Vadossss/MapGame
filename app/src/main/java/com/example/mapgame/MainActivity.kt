@@ -2,7 +2,6 @@ package com.example.mapgame
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
@@ -21,11 +20,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -122,7 +121,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return stringBuilder.toString()
     }
 
-    fun clickSound(view: View) {
+    fun clickSoundbtn(view: View) {
+        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0)
 //        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 //        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, )
 //        if(isChecked){
@@ -141,6 +142,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         myDialog.setContentView(achievementWindow)
         myDialog.setCancelable(true)
         myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val achieveList = achievementWindow.findViewById<RecyclerView>(R.id.list)
+        achieveList
         //textQuest.text = questText
         myDialog.show()
     }
@@ -199,25 +202,36 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
 
-
-
-
-
-
-        //getLastKnownLocation()
-
-
         video = findViewById(R.id.videoCom)
         btnSkip = findViewById(R.id.btnSkip)
 
 
         btnPositionNow = findViewById(R.id.btnPositionNow)
         btnPositionNow.setOnClickListener {
+//            if (ActivityCompat.checkSelfPermission(
+//                    this,
+//                    Manifest.permission.ACCESS_FINE_LOCATION
+//                ) != PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(
+//                    this,
+//                    Manifest.permission.ACCESS_COARSE_LOCATION
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//                ActivityCompat.requestPermissions(
+//                    this,
+//                    arrayOf(
+//                        Manifest.permission.ACCESS_FINE_LOCATION,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION
+//                    ),
+//                    LOCATION_PERMISSION_REQUEST_CODE
+//                )
+//            }
             isCheckCameraPosition = true
             Log.d(TAG, "")
             if (::locationNow.isInitialized) {
                 updateLocationOnMap(locationNow)
             }
+
         }
 
 
@@ -226,34 +240,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 
 
-        //checkPreferences()
+
         val map = mapView.mapWindow.map
-//        quest1_2 = NewQuest(this, map, R.array.quest1_2)
-//        quest1_2.createNewQuest()
-//        quest1_1 = NewQuest(this, map, R.array.quest1_1, quest1_2.placemark)
-//        quest1_1.createNewQuest()
-//
-//        quest2_2 = NewQuest(this, map, R.array.quest2_2)
-//        quest2_2.createNewQuest()
-//
-//        quest2_1 = NewQuest(this, map, R.array.quest2_1, quest2_2.placemark)
-//        quest2_1.createNewQuest()
-
-        quest = Quest(this, map, R.array.all_quest)
+        quest = Quest(this, this, map, R.array.all_quest)
         quest.initQuest()
-        //Log.d(TAG, "SharedPrefInfo: " + sharedPreferences.getBoolean("quest1.2Visible", false))
-
-
-//        quest2 = Quest(this, map, R.array.quest2)
-//        quest2.createQuest()
-
-
 
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-        allIcon()
 
 
         var cameraPositionJob : Job? = null
@@ -290,8 +285,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         mapView.map.addCameraListener(cameraList)
 
-        //sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
-        //sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -314,34 +307,32 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
     }
-
-
-    private fun checkPreferences() {
-        var questInfo = resources.getStringArray(R.array.quest1_1)
-        if (!sharedPreferences.contains(questInfo[0])) {
-            val editor = sharedPreferences.edit()
-            editor.putBoolean(questInfo[0], true) // Установить изначальное значение для quest1
-            editor.apply()
+    private fun requestLocationPermissions() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            // Разрешения уже предоставлены, выполняем необходимые действия
+            isCheckCameraPosition = true
+            Log.d(TAG, "Location permissions already granted")
+            if (::locationNow.isInitialized) {
+                updateLocationOnMap(locationNow)
+            }
         }
-        questInfo = resources.getStringArray(R.array.quest1_2)
-        if (!sharedPreferences.contains(questInfo[0])) {
-            val editor = sharedPreferences.edit()
-            editor.putBoolean(questInfo[0], false) // Установить изначальное значение для quest1
-            editor.apply()
-        }
-        questInfo = resources.getStringArray(R.array.quest2_1)
-        if (!sharedPreferences.contains(questInfo[0])) {
-            val editor = sharedPreferences.edit()
-            editor.putBoolean(questInfo[0], true) // Установить изначальное значение для quest1
-            editor.apply()
-        }
-        questInfo = resources.getStringArray(R.array.quest2_2)
-        if (!sharedPreferences.contains(questInfo[0])) {
-            val editor = sharedPreferences.edit()
-            editor.putBoolean(questInfo[0], false) // Установить изначальное значение для quest1
-            editor.apply()
-        }
-
     }
 
 
@@ -356,187 +347,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mapView.onStop()
         MapKitFactory.getInstance().onStop()
         super.onStop()
-    }
-
-//    private fun newDialog(nameQuest: Int, place: PlacemarkMapObject?) {
-//        var questInfo = resources.getStringArray(nameQuest)
-//        val dialogBinding = layoutInflater.inflate(R.layout.dialog_enemy, null)
-//        val myDialog = Dialog(this)
-//        val textQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
-//        myDialog.setContentView(dialogBinding)
-//        myDialog.setCancelable(true)
-//        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        textQuest.text = questInfo[1] + "\n" + questInfo[2]
-//        myDialog.show()
-//
-//
-//
-//        val btnClose = findViewById<ImageView>(R.id.btnClose)
-//        btnClose.setOnClickListener {
-//            video.stopPlayback()
-//            video.visibility = View.INVISIBLE
-//            btnClose.visibility = View.INVISIBLE
-//        }
-//
-//        val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
-//        btnBattle.setOnClickListener {
-//            myDialog.dismiss()
-//            video.visibility = View.VISIBLE
-//            video.setVideoPath("android.resource://" + packageName + "/" + R.raw.video1)
-//
-//            video.setOnPreparedListener {
-//                val layoutParams = video.layoutParams
-//                val d = findViewById<View>(R.id.lay)
-//                layoutParams.width = d.layoutParams.width
-//                layoutParams.height = d.layoutParams.height
-//                video.layoutParams = layoutParams
-//            }
-//            video.start()
-//            video.setOnCompletionListener {
-//                video.stopPlayback()
-//                video.visibility = View.INVISIBLE
-//                btnClose.visibility = View.INVISIBLE
-//            }
-//
-//
-//
-//            video.setOnTouchListener { _, event ->
-//                if (event.action == MotionEvent.ACTION_DOWN) {
-//                    if (btnClose.visibility == View.INVISIBLE)
-//                        btnClose.visibility = View.VISIBLE
-//                    else
-//                        btnClose.visibility = View.INVISIBLE
-//                }
-//                true
-//            }
-//
-//            val editor = sharedPreferences.edit()
-//            var currentState = sharedPreferences.getBoolean(questInfo[0], false)
-//            editor.putBoolean(questInfo[0], !currentState)
-//            editor.apply()
-//            updatePlacemarkVisibility(place, sharedPreferences.getBoolean(questInfo[0], false))
-//            Log.d(TAG, "QUEST1 BOOL: " + sharedPreferences.getBoolean(questInfo[0], false).toString())
-//
-//            if (questInfo.size > 3) {
-//                currentState = sharedPreferences.getBoolean(questInfo[3], false)
-//                editor.putBoolean(getString(R.string.quest2), !currentState)
-//                editor.apply()
-//                updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(questInfo[3], false))
-//                Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(questInfo[3], false).toString())
-//            }
-//
-////            currentState = sharedPreferences.getBoolean(getString(R.string.quest2), false)
-////            editor.putBoolean(getString(R.string.quest2), !currentState)
-////            editor.apply()
-////            updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
-////            Log.d(TAG, "QUEST2 BOOL: " + sharedPreferences.getBoolean(getString(R.string.quest2), false).toString())
-//
-//
-//        }
-//    }
-
-
-//    @SuppressLint("ClickableViewAccessibility", "InflateParams")
-//    private val iconTapListen = MapObjectTapListener { _, _ ->
-//        newDialog(R.array.quest1_1, placemark)
-//        true
-//    }
-//
-//    private val iconTapListen2 = MapObjectTapListener { _, _ ->
-//        newDialog(R.array.quest1_2, placemark1)
-//        true
-//    }
-//    private var placemark : PlacemarkMapObject? = null
-//    private var placemark1 : PlacemarkMapObject? = null
-
-
-
-    fun allIcon() {
-        val map = mapView.mapWindow.map
-        collection = map.mapObjects.addCollection()
-
-//        placemark = collection.addPlacemark().apply {
-//            geometry = Point(57.736260, 40.921054)
-//            addTapListener(iconTapListen)
-//            setText(
-//                "Ларец",
-//                TextStyle().apply {
-//                    size = 15f
-//                    placement = TextStyle.Placement.TOP
-//                    color = Color.WHITE
-//                },
-//            )
-//            useCompositeIcon().apply {
-//                setIcon(
-//                    "pin",
-//                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
-//                    IconStyle().apply {
-//                        anchor = PointF(0.5f, 1.0f)
-//                        scale = 0.3f
-//                    }
-//                )
-//            }
-//            isVisible = sharedPreferences.getBoolean(getString(R.string.quest1), false)
-//        }
-//        placemark1 = collection.addPlacemark().apply {
-//            geometry = Point(57.735604, 40.914032)
-//            addTapListener(iconTapListen2)
-//
-//            setText(
-//                "Кощей",
-//                TextStyle().apply {
-//                    size = 15f
-//                    placement = TextStyle.Placement.TOP
-//                    color = Color.WHITE
-//                    outlineColor = Color.BLACK
-//                },
-//            )
-//            useCompositeIcon().apply {
-//                setIcon(
-//                    ImageProvider.fromResource(this@MainActivity, R.drawable.animad),
-//                    IconStyle().apply {
-//                        anchor = PointF(0.5f, 1.0f)
-//                        scale = 0.3f
-//                    }
-//                )
-//            }
-//            isVisible = sharedPreferences.getBoolean(getString(R.string.quest2), false)
-//        }
-
-    }
-
-    private fun putUri() {
-        val navigation = NavigationFactory.createNavigation(DrivingRouterType.ONLINE)
-        navigation.resolveUri(uri.toString())
-        Toast.makeText(this, navigation.routes.toString(), Toast.LENGTH_SHORT).show()
-        val nl = object : NavigationListener {
-
-
-            override fun onRoutesRequested(p0: MutableList<RequestPoint>) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onAlternativesRequested(p0: DrivingRoute) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onUriResolvingRequested(p0: String) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onRoutesBuilt() {
-                TODO("Not yet implemented")
-            }
-
-            override fun onRoutesRequestError(p0: Error) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onResetRoutes() {
-                TODO("Not yet implemented")
-            }
-
-        }
     }
 
     override fun onResume() {
@@ -556,22 +366,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
 
-
-
         accelerometer?.also { sensor ->
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
         }
         magnetometer?.also { sensor ->
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
         }
-
-        if (isFirstResume) {
-            isFirstResume = false
-            return
-        }
-
-
-
     }
 
     private fun put() {
@@ -632,10 +432,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     @SuppressLint("ClickableViewAccessibility")
     fun click(view: View) {
 
-        val editor = sharedPreferences.edit()
-        editor.clear()
-        editor.apply()
-        quest.resetQuests()
+//        val editor = sharedPreferences.edit()
+//        editor.clear()
+//        editor.apply()
+//        quest.resetQuests()
 //        updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
 //        updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
 //        val s = placemark1?.isVisible
@@ -693,11 +493,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun startLocationUpdates() {
-//        val locationRequest = LocationRequest.create().apply {
-//            interval = 1000 // 10 секунд
-//            fastestInterval = 1000 // 5 секунд
-//            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-//        }
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -812,10 +607,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             azimuth,
                             100.0f
                         ),
-                        //Animation(Animation.Type.SMOOTH, 3f), null
                     )
-//
-//                    put()
                 } else {
                     Log.d(TAG, "Last known location is null.")
                 }

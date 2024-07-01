@@ -50,7 +50,7 @@
         android:backgroundTint="#6A000000"
         android:paddingLeft="20dp"
         android:paddingTop="15dp"
-        android:textColorLink="#00474747"
+        android:textColorLink="#FFFFFF"
         app:cornerRadius="1000dp"
         app:icon="@drawable/strelka"
         app:iconGravity="textTop"
@@ -62,7 +62,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.837"
-        app:rippleColor="#280C0C0C" />
+        app:rippleColor="#25878787" />
 
     <Button
         android:id="@+id/btnSettings"
@@ -72,6 +72,7 @@
         android:onClick="clickSettings"
         android:paddingLeft="24dp"
         android:paddingTop="7dp"
+        android:textColorLink="#FFFFFF"
         app:cornerRadius="25px"
         app:icon="@drawable/icon_settings"
         app:iconGravity="top"
@@ -83,7 +84,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.326"
-        app:rippleColor="#280C0C0C" />
+        app:rippleColor="#25878787" />
 
     <Button
         android:id="@+id/btnAchievement"

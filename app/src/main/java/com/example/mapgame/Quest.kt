@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.yandex.mapkit.map.Map
 
-class Quest(private var context: Context, private var map: Map, private var allQuest: Int) {
+class Quest(private var activity: MainActivity, private var context: Context, private var map: Map, private var allQuest: Int) {
     private lateinit var quest: NewQuest
     private var questList: MutableList<MutableList<NewQuest>> = mutableListOf()
     private var sharedPreferences: SharedPreferences =
@@ -48,14 +48,14 @@ class Quest(private var context: Context, private var map: Map, private var allQ
                 val nameQuest = questArray.getResourceId(i, -1)
                 checkPreferences(nameQuest)
                 if (questArray.length() == 1) {
-                    quest = NewQuest(context, map, nameQuest)
+                    quest = NewQuest(activity, context, map, nameQuest)
                     quest.createNewQuest()
                 } else if (questArray.length() - 1 == i && questArray.length() > 1) {
-                    quest = NewQuest(context, map, nameQuest)
+                    quest = NewQuest(activity, context, map, nameQuest)
                     quest.createNewQuest()
                     questList.add(quest)
                 } else {
-                    quest = NewQuest(context, map, nameQuest, questList.last())
+                    quest = NewQuest(activity, context, map, nameQuest, questList.last())
                     quest.createNewQuest()
                     questList.add(quest)
                 }

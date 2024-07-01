@@ -8,6 +8,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.PointF
@@ -25,6 +26,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.VideoView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
@@ -57,6 +60,8 @@ class NewQuest {
     private var questVisible: Boolean
     private var video: VideoView
     private val mainActiv: Activity
+    private val activity: MainActivity
+    private var resultLauncher: ActivityResultLauncher<Intent>
 
 
 
@@ -70,7 +75,7 @@ class NewQuest {
         return questVisible
     }
 
-    constructor(context: Context, map: Map, nameQuest: Int) {
+    constructor(activity: MainActivity,context: Context, map: Map, nameQuest: Int) {
         this.map = map
         this.nameQuest = nameQuest
         this.context = context
@@ -86,9 +91,34 @@ class NewQuest {
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
         setVideo()
+        this.activity = activity
+        resultLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                achievementWindow()
+                val editor = sharedPreferences.edit()
+                //val currentState = sharedPreferences.getBoolean(questName, false)
+                editor.putBoolean(questName, true)
+                editor.putBoolean(questName+"Visible", false)
+                Log.d(TAG, "Questname: "+sharedPreferences.getBoolean(questName+"Visible", false).toString())
+                updatePlacemarkVisibility(placemark, false)
+
+
+                /*placemark может быть null, в таком случае ничего не произойдёт*/
+                updatePlacemarkVisibility(placemarkNext?.placemark, true)
+                editor.putBoolean(placemarkNext?.getQuestName() + "Visible", true)
+                Log.d(
+                    TAG,
+                    "QuestnameNext: " + sharedPreferences.getBoolean(
+                        placemarkNext?.getQuestName() + "Visible",
+                        false
+                    ).toString()
+                )
+                editor.apply()
+            }
+        }
     }
 
-    constructor(context: Context, map: Map, nameQuest: Int, placemarkNext: NewQuest) {
+    constructor(activity: MainActivity, context: Context, map: Map, nameQuest: Int, placemarkNext: NewQuest) {
         this.map = map
         this.nameQuest = nameQuest
         this.context = context
@@ -105,6 +135,31 @@ class NewQuest {
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
         setVideo()
+        this.activity = activity
+        resultLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                achievementWindow()
+                val editor = sharedPreferences.edit()
+                //val currentState = sharedPreferences.getBoolean(questName, false)
+                editor.putBoolean(questName, true)
+                editor.putBoolean(questName+"Visible", false)
+                Log.d(TAG, "Questname: "+sharedPreferences.getBoolean(questName+"Visible", false).toString())
+                updatePlacemarkVisibility(placemark, false)
+
+
+                /*placemark может быть null, в таком случае ничего не произойдёт*/
+                updatePlacemarkVisibility(placemarkNext.placemark, true)
+                editor.putBoolean(placemarkNext.getQuestName() + "Visible", true)
+                Log.d(
+                    TAG,
+                    "QuestnameNext: " + sharedPreferences.getBoolean(
+                        placemarkNext.getQuestName() + "Visible",
+                        false
+                    ).toString()
+                )
+                editor.apply()
+            }
+        }
     }
 
     private fun setVideo() {
@@ -163,7 +218,6 @@ class NewQuest {
     }
 
     private fun fadeOut(view: View) {
-        //view.visibility = View.INVISIBLE
         val animator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f)
         animator.duration = 200 // Длительность анимации в миллисекундах
         animator.interpolator = AccelerateDecelerateInterpolator()
@@ -198,12 +252,33 @@ class NewQuest {
         val decorView = mainActiv.window.decorView as ViewGroup
         decorView.addView(dimmingView)
 
-        // Анимация изменения прозрачности
+
         val animator = ObjectAnimator.ofFloat(dimmingView, "alpha", 0f, 1f, 0f)
         animator.duration = 500 // Длительность анимации в миллисекундах
         animator.interpolator = AccelerateDecelerateInterpolator()
         animator.start()
     }
+
+    @SuppressLint("ObjectAnimatorBinding")
+    private fun fadeOutView() {
+        dimmingView = View(context)
+        dimmingView?.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dimmingView?.setBackgroundColor(Color.BLACK)
+        dimmingView?.alpha = 0f // Начальная прозрачность
+
+        val decorView = mainActiv.window.decorView as ViewGroup
+        decorView.addView(dimmingView)
+
+        val animator = ObjectAnimator.ofFloat(dimmingView, "alpha", 1f, 0f)
+        animator.duration = 2000 // Длительность анимации в миллисекундах
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.start()
+    }
+
+
 
     @SuppressLint("ClickableViewAccessibility")
     private fun newDialog() {
@@ -219,12 +294,14 @@ class NewQuest {
         textQuest.text = questText
         myDialog.show()
 
-
+        val intent = Intent(context, ARActivity::class.java)
         val btnClose = mainActiv.findViewById<ImageView>(R.id.btnClose)
         btnClose.setOnClickListener {
             video.stopPlayback()
+            fadeOutView()
             video.visibility = View.INVISIBLE
             btnClose.visibility = View.INVISIBLE
+            resultLauncher.launch(intent)
         }
 
         val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
@@ -241,10 +318,12 @@ class NewQuest {
 
             video.setOnCompletionListener {
                 video.stopPlayback()
+                fadeOutView()
                 video.visibility = View.INVISIBLE
                 btnClose.visibility = View.INVISIBLE
                 fadeOut(btnClose)
-                achievementWindow()
+                fadeInDimmingView()
+                resultLauncher.launch(intent)
             }
 
 
@@ -264,25 +343,7 @@ class NewQuest {
 
 
 
-            val editor = sharedPreferences.edit()
-            //val currentState = sharedPreferences.getBoolean(questName, false)
-            editor.putBoolean(questName, true)
-            editor.putBoolean(questName+"Visible", false)
-            Log.d(TAG, "Questname: "+sharedPreferences.getBoolean(questName+"Visible", false).toString())
-            updatePlacemarkVisibility(placemark, false)
 
-
-            /*placemark может быть null, в таком случае ничего не произойдёт*/
-            updatePlacemarkVisibility(placemarkNext?.placemark, true)
-            editor.putBoolean(placemarkNext?.getQuestName() + "Visible", true)
-            Log.d(
-                TAG,
-                "QuestnameNext: " + sharedPreferences.getBoolean(
-                    placemarkNext?.getQuestName() + "Visible",
-                    false
-                ).toString()
-            )
-            editor.apply()
 
         }
     }
