@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:onClick="click"
         android:text="Button"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/videoCom"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,6 +63,49 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.837"
         app:rippleColor="#280C0C0C" />
+
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="60dp"
+        android:layout_height="63dp"
+        android:backgroundTint="#74000000"
+        android:onClick="clickSettings"
+        android:paddingLeft="24dp"
+        android:paddingTop="7dp"
+        app:cornerRadius="25px"
+        app:icon="@drawable/icon_settings"
+        app:iconGravity="top"
+        app:iconSize="40dp"
+        app:iconTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.954"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.326"
+        app:rippleColor="#280C0C0C" />
+
+    <Button
+        android:id="@+id/btnAchievement"
+        android:layout_width="60dp"
+        android:layout_height="65dp"
+        android:backgroundTint="#74000000"
+        android:onClick="clickBtnAchieve"
+        android:paddingTop="8dp"
+        android:textColorLink="#FFFFFF"
+        app:cornerRadius="25px"
+        app:icon="@drawable/icon_achievement"
+        app:iconGravity="top"
+        app:iconPadding="0dp"
+        app:iconSize="40dp"
+        app:iconTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.953"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.218"
+        app:rippleColor="#25878787" />
 
     <VideoView
         android:id="@+id/videoCom"

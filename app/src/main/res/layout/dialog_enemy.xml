@@ -20,17 +20,34 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/textQuest"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:id="@+id/locationQuest"
+                android:layout_width="342dp"
+                android:layout_height="53dp"
                 android:layout_weight="1"
+                android:autoText="true"
+                android:elegantTextHeight="false"
                 android:gravity="center"
                 android:text="Это соловей разбойник"
                 android:textColor="#000000"
+                android:textSize="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.412"
+                app:layout_constraintVertical_bias="0.008"
                 tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:id="@+id/questText"
+                android:layout_width="340dp"
+                android:layout_height="146dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="TextView"
+                android:textColor="#000000"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.666"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.428" />
 
             <Button
                 android:id="@+id/btnBattle"

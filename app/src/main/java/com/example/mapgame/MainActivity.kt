@@ -2,6 +2,7 @@ package com.example.mapgame
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
@@ -13,6 +14,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -120,6 +122,56 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return stringBuilder.toString()
     }
 
+    fun clickSound(view: View) {
+//        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+//        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, )
+//        if(isChecked){
+//            val audioManager =            (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+//        }else{
+//            audioManager =    (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+//        }
+    }
+
+    private fun openAchievementsWindow() {
+        val achievementWindow = LayoutInflater.from(this).inflate(R.layout.achievement_list, null)
+        val myDialog = Dialog(this)
+        //val textQuest = achievementWindow.findViewById<TextView>(R.id.textQuest)
+        myDialog.setContentView(achievementWindow)
+        myDialog.setCancelable(true)
+        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        //textQuest.text = questText
+        myDialog.show()
+    }
+
+    fun clickBtnAchieve(view: View) {
+        openAchievementsWindow()
+    }
+
+    fun clickSettings(view: View) {
+        openSettingsWindow()
+    }
+
+    private fun openSettingsWindow() {
+        val achievementWindow = LayoutInflater.from(this).inflate(R.layout.settings_layout, null)
+        val myDialog = Dialog(this)
+        val btnNewGame = achievementWindow.findViewById<Button>(R.id.btnNewGame)
+        btnNewGame.setOnClickListener {
+            val editor = sharedPreferences.edit()
+            editor.clear()
+            editor.apply()
+            quest.resetQuests()
+        }
+        //val textQuest = achievementWindow.findViewById<TextView>(R.id.textQuest)
+        myDialog.setContentView(achievementWindow)
+        myDialog.setCancelable(true)
+        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        myDialog.window?.setWindowAnimations(R.style.dialog_animation_fade)
+        //textQuest.text = questText
+        myDialog.show()
+    }
+
     private var checkCompliteGPS : Boolean = false
 
 
@@ -133,7 +185,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mapView = findViewById(R.id.mapview)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mapView.map.isTiltGesturesEnabled = false
-        mapView.map.isZoomGesturesEnabled = false
+        //mapView.map.isZoomGesturesEnabled = false
 
 
 
@@ -163,7 +215,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         btnPositionNow.setOnClickListener {
             isCheckCameraPosition = true
             Log.d(TAG, "")
-            updateLocationOnMap(locationNow)
+            if (::locationNow.isInitialized) {
+                updateLocationOnMap(locationNow)
+            }
         }
 
 

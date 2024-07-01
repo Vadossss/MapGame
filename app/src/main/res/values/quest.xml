@@ -26,7 +26,7 @@
         <item name="location_name">КГУ</item>
         <item name="text">Здесь ты найдёшь ларец</item>
         <item name="next_quest">quest1.2</item>
-        <item name="icon_path">0</item>
+        <item name="icon_path">@drawable/icon_kochei</item>
         <item name="visible">true</item>
         <item name="achievement_name">Большая сила в руках</item>
         <item name="achievement_text">Найти ларец с иголкой</item>
@@ -39,10 +39,10 @@
         <item name="location_name">КГУ школа</item>
         <item name="text">А здесь сидит кощей. Одолей его и освободи что-то</item>
         <item name="next_quest"></item>
-        <item name="icon_path">0</item>
+        <item name="icon_path">@drawable/icon_kochei</item>
         <item name="visible">false</item>
-        <item name="achievement_name">Большая сила в руках</item>
-        <item name="achievement_text">Найти ларец с иголкой</item>
+        <item name="achievement_name">Костяная пыль</item>
+        <item name="achievement_text">Победить Кощея</item>
         <item name="enemy">Противник: Кощей</item>
     </string-array>
     <string-array name="quest2.1">
@@ -52,7 +52,7 @@
         <item name="location_name">SAD</item>
         <item name="text">Здесь ты рос</item>
         <item name="next_quest">quest2.2</item>
-        <item name="icon_path">1</item>
+        <item name="icon_path">@drawable/animad</item>
         <item name="visible">true</item>
         <item name="achievement_name">Большая сила в руках</item>
         <item name="achievement_text">Найти ларец с иголкой</item>
@@ -65,7 +65,7 @@
         <item name="location_name">Паново</item>
         <item name="text">А здесь ты покупал пиво</item>
         <item name="next_quest"></item>
-        <item name="icon_path">1</item>
+        <item name="icon_path">@drawable/animad</item>
         <item name="visible">false</item>
         <item name="achievement_name">Большая сила в руках</item>
         <item name="achievement_text">Найти ларец с иголкой</item>

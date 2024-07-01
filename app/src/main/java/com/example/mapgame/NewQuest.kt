@@ -1,5 +1,8 @@
 package com.example.mapgame
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
@@ -14,7 +17,10 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -47,8 +53,10 @@ class NewQuest {
     private var locationName: String
     private var questText: String
 //    private var questNext: String
-    private var iconIndex: Int
+    private var iconIndex: Int = 6
     private var questVisible: Boolean
+    private var video: VideoView
+    private val mainActiv: Activity
 
 
 
@@ -73,8 +81,11 @@ class NewQuest {
         locationName = questInfo[3]
         questText = questInfo[4]
 //        questNext = questInfo[5]
-        iconIndex = questInfo[6].toInt()
+        //iconIndex = questInfo[6].toInt()
         questVisible = questInfo[7].toBoolean()
+        mainActiv = context as Activity
+        video = mainActiv.findViewById(R.id.videoCom)
+        setVideo()
     }
 
     constructor(context: Context, map: Map, nameQuest: Int, placemarkNext: NewQuest) {
@@ -89,10 +100,24 @@ class NewQuest {
         locationName = questInfo[3]
         questText = questInfo[4]
 //        questNext = questInfo[5]
-        iconIndex = questInfo[6].toInt()
+        //iconIndex = questInfo[6].toInt()
         questVisible = questInfo[7].toBoolean()
+        mainActiv = context as Activity
+        video = mainActiv.findViewById(R.id.videoCom)
+        setVideo()
     }
 
+    private fun setVideo() {
+        video.setVideoPath("android.resource://" + context.packageName + "/" + R.raw.video1)
+
+        video.setOnPreparedListener {
+            val layoutParams = video.layoutParams
+            val d = mainActiv.findViewById<View>(R.id.lay)
+            layoutParams.width = d.layoutParams.width
+            layoutParams.height = d.layoutParams.height
+            video.layoutParams = layoutParams
+        }
+    }
 
     private val iconTapListen = MapObjectTapListener { _, _ ->
         newDialog()
@@ -105,7 +130,7 @@ class NewQuest {
 
 
     fun createNewQuest() {
-        val icons = context.resources.obtainTypedArray(R.array.icons)
+        val icons = context.resources.obtainTypedArray(nameQuest)
         try {
             val selectedIconResId = icons.getResourceId(iconIndex, -1)
 
@@ -137,21 +162,63 @@ class NewQuest {
         }
     }
 
+    private fun fadeOut(view: View) {
+        //view.visibility = View.INVISIBLE
+        val animator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f)
+        animator.duration = 200 // Длительность анимации в миллисекундах
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                view.visibility = View.INVISIBLE
+            }
+        })
+        animator.start()
+    }
+
+    // Функция для плавного появления кнопки
+    private fun fadeIn(view: View) {
+        view.visibility = View.VISIBLE
+        val animator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f)
+        animator.duration = 300 // Длительность анимации в миллисекундах
+        animator.interpolator = DecelerateInterpolator()
+        animator.start()
+    }
+    private var dimmingView: View? = null
+
+    @SuppressLint("ObjectAnimatorBinding")
+    private fun fadeInDimmingView() {
+        dimmingView = View(context)
+        dimmingView?.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dimmingView?.setBackgroundColor(Color.BLACK)
+        dimmingView?.alpha = 0f // Начальная прозрачность
+
+        val decorView = mainActiv.window.decorView as ViewGroup
+        decorView.addView(dimmingView)
+
+        // Анимация изменения прозрачности
+        val animator = ObjectAnimator.ofFloat(dimmingView, "alpha", 0f, 1f, 0f)
+        animator.duration = 500 // Длительность анимации в миллисекундах
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.start()
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun newDialog() {
         val dialogBinding = LayoutInflater.from(context).inflate(R.layout.dialog_enemy, null)
-        val mainActiv = context as Activity
         val myDialog = Dialog(context)
-        val textQuest = dialogBinding.findViewById<TextView>(R.id.textQuest)
+        val locationQuest = dialogBinding.findViewById<TextView>(R.id.locationQuest)
+        val textQuest = dialogBinding.findViewById<TextView>(R.id.questText)
         myDialog.setContentView(dialogBinding)
         myDialog.setCancelable(true)
         myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        myDialog.window?.setWindowAnimations(R.style.dialog_animation_fade)
+        locationQuest.text = questInfo[3]
         textQuest.text = questText
         myDialog.show()
 
-
-        val video = mainActiv.findViewById<VideoView>(R.id.videoCom)
 
         val btnClose = mainActiv.findViewById<ImageView>(R.id.btnClose)
         btnClose.setOnClickListener {
@@ -162,24 +229,21 @@ class NewQuest {
 
         val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
         btnBattle.setOnClickListener {
+            fadeInDimmingView()
+            video.start()
+            video.visibility = View.VISIBLE
 
             myDialog.dismiss()
 
-            video.visibility = View.VISIBLE
-            video.setVideoPath("android.resource://" + context.packageName + "/" + R.raw.video1)
 
-            video.setOnPreparedListener {
-                val layoutParams = video.layoutParams
-                val d = mainActiv.findViewById<View>(R.id.lay)
-                layoutParams.width = d.layoutParams.width
-                layoutParams.height = d.layoutParams.height
-                video.layoutParams = layoutParams
-            }
-            video.start()
+
+
+
             video.setOnCompletionListener {
                 video.stopPlayback()
                 video.visibility = View.INVISIBLE
                 btnClose.visibility = View.INVISIBLE
+                fadeOut(btnClose)
                 achievementWindow()
             }
 
@@ -187,13 +251,18 @@ class NewQuest {
 
             video.setOnTouchListener {_, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
-                    if (btnClose.visibility == View.INVISIBLE)
-                        btnClose.visibility = View.VISIBLE
-                    else
-                        btnClose.visibility = View.INVISIBLE
+                    if (btnClose.visibility == View.INVISIBLE) {
+                        fadeIn(btnClose)
+                    }
+                    else {
+                        fadeOut(btnClose)
+                    }
                 }
                 true
             }
+
+
+
 
             val editor = sharedPreferences.edit()
             //val currentState = sharedPreferences.getBoolean(questName, false)
