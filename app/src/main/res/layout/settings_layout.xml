@@ -46,12 +46,18 @@
                 android:id="@+id/btnNewGame"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Новая игра"
+                android:backgroundTint="#000000"
+                android:foregroundTint="#FFFFFF"
+                android:text="Начать новую игру"
+                android:textColor="#FFFFFF"
+                android:textColorLink="#FFFFFF"
+                app:cornerRadius="25px"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.26" />
+                app:layout_constraintVertical_bias="0.175"
+                app:rippleColor="#FFFFFF" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

@@ -8,7 +8,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="343dp"
         android:layout_height="293dp"
-        android:backgroundTint="#C3C3C3"
+        android:backgroundTint="#FFFFFF"
         app:cardBackgroundColor="#FF0C0C"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -56,6 +56,8 @@
                 android:layout_weight="1"
                 android:backgroundTint="#3D8E1A"
                 android:text="Начать битву"
+                android:textColor="#FFFFFF"
+                android:textColorLink="#FFFFFF"
                 app:cornerRadius="20px"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

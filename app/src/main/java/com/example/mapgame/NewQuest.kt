@@ -273,7 +273,7 @@ class NewQuest {
         decorView.addView(dimmingView)
 
         val animator = ObjectAnimator.ofFloat(dimmingView, "alpha", 1f, 0f)
-        animator.duration = 2000 // Длительность анимации в миллисекундах
+        animator.duration = 4000 // Длительность анимации в миллисекундах
         animator.interpolator = AccelerateDecelerateInterpolator()
         animator.start()
     }
@@ -282,6 +282,7 @@ class NewQuest {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun newDialog() {
+        DialogManager.closeAllDialogs()
         val dialogBinding = LayoutInflater.from(context).inflate(R.layout.dialog_enemy, null)
         val myDialog = Dialog(context)
         val locationQuest = dialogBinding.findViewById<TextView>(R.id.locationQuest)
@@ -293,6 +294,8 @@ class NewQuest {
         locationQuest.text = questInfo[3]
         textQuest.text = questText
         myDialog.show()
+
+        DialogManager.addDialog(myDialog)
 
         val intent = Intent(context, ArActivity::class.java)
         val btnClose = mainActiv.findViewById<ImageView>(R.id.btnClose)
@@ -311,10 +314,6 @@ class NewQuest {
             video.visibility = View.VISIBLE
 
             myDialog.dismiss()
-
-
-
-
 
             video.setOnCompletionListener {
                 video.stopPlayback()

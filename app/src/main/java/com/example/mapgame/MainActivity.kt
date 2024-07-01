@@ -2,7 +2,9 @@ package com.example.mapgame
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.Dialog
+import android.app.ProgressDialog.show
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -14,16 +16,15 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.AudioManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -48,7 +49,6 @@ import com.yandex.mapkit.map.RotationType
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.navigation.automotive.NavigationFactory
 import com.yandex.mapkit.navigation.automotive.NavigationListener
-import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -69,20 +69,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private val r = FloatArray(9)
     private val i = FloatArray(9)
     private var azimuth: Float = 0f
-    private lateinit var quest1_1: NewQuest
-    private lateinit var quest1_2: NewQuest
-    private lateinit var quest2_1: NewQuest
-    private lateinit var quest2_2: NewQuest
     private lateinit var quest: Quest
-    private lateinit var quest2: Quest
-
+    private var iconIndex: Int = 10
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mapView: MapView
     private lateinit var locationNow: Point
-    private var uri: Uri =
-        Uri.parse("yandexnavi://build_route_on_map?lat_from=57.732670&lon_from=40.912260&lat_to=55.76&lon_to=37.64")
-
 
     private val topLeft =
         Point(57.731909, 40.914427)  // Пример координат для Москвы (верхний левый угол зоны)
@@ -142,8 +134,37 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         myDialog.setContentView(achievementWindow)
         myDialog.setCancelable(true)
         myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        myDialog.window?.setWindowAnimations(R.style.dialog_animation_fade)
         val achieveList = achievementWindow.findViewById<RecyclerView>(R.id.list)
-        achieveList
+        achieveList.layoutManager = LinearLayoutManager(this)
+        val spacingInPixels = resources.getDimensionPixelSize(R.dimen.item_spacing)
+        achieveList.addItemDecoration(SpaceItemDecoration(spacingInPixels))
+        val achievements : MutableList<Achievement> = mutableListOf()
+        val info = resources.obtainTypedArray(R.array.all_quest)
+        for (i in 0 until info.length()) {
+            Log.d(TAG, "Имя: "+ info.length())
+            val index = info.getResourceId(i, -1)
+            val questArray = resources.obtainTypedArray(index)
+            for (j in 0 until questArray.length()) {
+                val nameQuest = questArray.getResourceId(j, -1)
+                val questInfo = resources.getStringArray(nameQuest)
+                val icons = resources.obtainTypedArray(nameQuest)
+                val selectedIconResId = icons.getResourceId(iconIndex, -1)
+                Log.d(TAG, "Имя: " + questInfo[0])
+                if (sharedPreferences.getBoolean(questInfo[0], false)) {
+                    Log.d(TAG,
+                        "Проверка значений: " + sharedPreferences.getBoolean(questInfo[0], false)
+                            .toString()
+                    )
+                    achievements.add(Achievement(questInfo[8], questInfo[9], selectedIconResId))
+                }
+            }
+        }
+
+        // Пример списка достижений
+        info.recycle()
+
+        achieveList.adapter = AchievementAdapter(achievements)
         //textQuest.text = questText
         myDialog.show()
     }
@@ -161,10 +182,24 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val myDialog = Dialog(this)
         val btnNewGame = achievementWindow.findViewById<Button>(R.id.btnNewGame)
         btnNewGame.setOnClickListener {
-            val editor = sharedPreferences.edit()
-            editor.clear()
-            editor.apply()
-            quest.resetQuests()
+            AlertDialog.Builder(this).apply {
+                setTitle("Начать новую игру")
+                setMessage("Вы уверены, что хотите начать новую игру? Прогресс текущего прохождения будет утерян.")
+                setPositiveButton("Да") { dialog, _ ->
+                    // Очищаем данные и сбрасываем квесты при подтверждении
+                    val editor = sharedPreferences.edit()
+                    editor.clear()
+                    editor.apply()
+                    quest.resetQuests()
+                    dialog.dismiss()
+                }
+                setNegativeButton("Нет") { dialog, _ ->
+                    // Закрываем диалог при отказе
+                    dialog.dismiss()
+                }
+                create()
+                show()
+            }
         }
         //val textQuest = achievementWindow.findViewById<TextView>(R.id.textQuest)
         myDialog.setContentView(achievementWindow)

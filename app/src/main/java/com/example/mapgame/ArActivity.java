@@ -87,24 +87,19 @@ public class ArActivity extends AppCompatActivity implements
         hit_btn.setOnClickListener(v -> {
             if(placed)
             {
-                Toast.makeText(this, "Удар", Toast.LENGTH_SHORT).show();
                 String textFromTextView = progressValue.getText().toString();
                 try {
                     // Пытаемся преобразовать текст в целое число
                     int intValue = Integer.parseInt(textFromTextView);
-
-                    if (intValue < 1) {
+                    lives -= 10;
+                    progressBar.setProgress(lives);
+                    progressValue.setText(String.valueOf(lives));
+                    if (lives < 1) {
                         lives = 0;
                         Intent intent = new Intent(this, MainActivity.class);
                         setResult(RESULT_OK, intent);
                         finish();
-
-
-                    } else {
-                        lives -= 10;
                     }
-                    progressBar.setProgress(lives);
-                    progressValue.setText(String.valueOf(lives));
                 } catch (NumberFormatException e) {
                     // В случае ошибки преобразования текста в int
                     e.printStackTrace();
