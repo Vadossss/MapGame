@@ -74,7 +74,12 @@ class NewQuest {
 
 
     private lateinit var collection: MapObjectCollection
-
+    fun getName(): Int {
+        return nameQuest
+    }
+    fun getLocationName(): String {
+        return locationName
+    }
 
     fun getQuestName(): String {
         return questName
@@ -192,8 +197,17 @@ class NewQuest {
 
     fun createNewQuest() {
         val icons = context.resources.obtainTypedArray(nameQuest)
+        var colorPlacemark = Color.WHITE
+        var selectedIconResId = 0
         try {
-            val selectedIconResId = icons.getResourceId(iconIndex, -1)
+            if (sharedPreferences.getBoolean("nightTheme", false)) {
+                selectedIconResId = icons.getResourceId(5, -1)
+                colorPlacemark = Color.WHITE
+            }
+            else {
+                selectedIconResId = icons.getResourceId(iconIndex, -1)
+                colorPlacemark = Color.BLACK
+            }
 
             collection = map.mapObjects.addCollection()
             placemark = collection.addPlacemark().apply {
@@ -205,7 +219,7 @@ class NewQuest {
                     TextStyle().apply {
                         size = 15f
                         placement = TextStyle.Placement.TOP
-                        color = Color.WHITE
+                        color = colorPlacemark
                     },
                 )
                 useCompositeIcon().apply {
@@ -289,7 +303,7 @@ class NewQuest {
 
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun newDialog() {
+    fun newDialog() {
         DialogManager.closeAllDialogs()
         val dialogBinding = LayoutInflater.from(context).inflate(R.layout.dialog_enemy, null)
         val myDialog = Dialog(context)
@@ -355,7 +369,7 @@ class NewQuest {
             resultLauncher.launch(intent)
         }
         else if (typeQuest == QUEST_NAME_MEMO) {
-            val intent = Intent(context, CardGame::class.java)
+            val intent = Intent(context, CardGameActivity::class.java)
             resultLauncher.launch(intent)
         }
         else if (typeQuest == QUEST_NAME_NUMBERS) {

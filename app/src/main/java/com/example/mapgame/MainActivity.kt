@@ -181,6 +181,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val achievementWindow = LayoutInflater.from(this).inflate(R.layout.settings_layout, null)
         val myDialog = Dialog(this)
         val btnNewGame = achievementWindow.findViewById<Button>(R.id.btnNewGame)
+
+        val btnTheme = achievementWindow.findViewById<Button>(R.id.btn_theme)
+
+        btnTheme.setOnClickListener {
+            mapView.map.isNightModeEnabled = !sharedPreferences.getBoolean("nightTheme", false)
+
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("nightTheme", !sharedPreferences.getBoolean("nightTheme", false))
+            editor.apply()
+            Log.d(TAG, "NightMode: " + sharedPreferences.getBoolean("nightTheme", false))
+            quest.changeIconTheme()
+        }
+
         btnNewGame.setOnClickListener {
             AlertDialog.Builder(this).apply {
                 setTitle("Начать новую игру")
@@ -218,23 +231,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         MapKitFactory.setApiKey("204ee658-86b7-453b-90db-dd6a00cdc770")
         MapKitFactory.initialize(this)
         setContentView(R.layout.activity_main)
-
+        sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 
         mapView = findViewById(R.id.mapview)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mapView.map.isTiltGesturesEnabled = false
-        //mapView.map.isZoomGesturesEnabled = false
-
 
 
         val jsonStr = parseJsonInString("customization.json")
-        mapView.map.isNightModeEnabled = true
         mapView.map.setMapStyle(jsonStr)
+
 
         mapView.map.move(CameraPosition(
             bottomRight, 17.0f, azimuth, 100f
         ))
-
 
 
         video = findViewById(R.id.videoCom)
@@ -270,15 +280,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
 
-
-
-        sharedPreferences = getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
-
+        if (!sharedPreferences.getBoolean("nightTheme", false)) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("nightTheme", false)
+            editor.apply()
+        }
+        mapView.map.isNightModeEnabled = sharedPreferences.getBoolean("nightTheme", false)
 
 
         val map = mapView.mapWindow.map
         quest = Quest(this, this, map, R.array.all_quest)
         quest.initQuest()
+        //quest.changeIconTheme()
+        Log.d(TAG, "NightMode: " + sharedPreferences.getBoolean("nightTheme", false))
 
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
@@ -312,7 +326,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     Log.d(TAG, "CheckCameraPosition: $isCheckCameraPosition")
                     } else {
                         isCheckCameraPosition = false
-//                        Log.d(TAG, "CheckCameraPositionfasssssss: $isCheckCameraPosition")
                     }
                 }
             }
@@ -339,9 +352,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             )
             return
         }
-
-
     }
+
     private fun requestLocationPermissions() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -409,122 +421,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    private fun put() {
-        val navigation = NavigationFactory.createNavigation(DrivingRouterType.COMBINED)
-        val requestPoints = listOf(
-            RequestPoint(Point(57.732712, 40.912036), RequestPointType.WAYPOINT, null, null),
-            RequestPoint(Point(57.731272, 40.922436), RequestPointType.WAYPOINT, null, null),
-            RequestPoint(Point(25.189279, 55.282246), RequestPointType.VIAPOINT, null, null),
-            RequestPoint(Point(25.196605, 55.280940), RequestPointType.WAYPOINT, null, null),
-        )
-        navigation.requestRoutes(
-            requestPoints,
-            navigation.guidance.location?.heading,
-            1,
-        )
-//        Toast.makeText(this, navigation.routes.toString(), Toast.LENGTH_SHORT).show()
-
-        val navigationListener = object : NavigationListener {
-            override fun onRoutesRequested(p0: MutableList<RequestPoint>) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onAlternativesRequested(p0: DrivingRoute) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onUriResolvingRequested(p0: String) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onRoutesBuilt() {
-                val routes = navigation.routes
-                val fastestRoute = routes[0]
-                Log.d(TAG, "Маршрут $fastestRoute")
-                // Routes received successfully ...
-            }
-
-            override fun onRoutesRequestError(p0: com.yandex.runtime.Error) {
-                return
-
-
-                // Логируем ошибку для отладки
-
-            }
-
-            override fun onResetRoutes() {
-                TODO("Not yet implemented")
-            }
-
-            // Override other listener's methods
-        }
-
-// You have to subscribe to Navigation before calling the route/alternative request
-        navigation.addListener(navigationListener)
-        isFirstResume = false
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     fun click(view: View) {
-
-//        val editor = sharedPreferences.edit()
-//        editor.clear()
-//        editor.apply()
-//        quest.resetQuests()
-//        updatePlacemarkVisibility(placemark, sharedPreferences.getBoolean(getString(R.string.quest1), false))
-//        updatePlacemarkVisibility(placemark1, sharedPreferences.getBoolean(getString(R.string.quest2), false))
-//        val s = placemark1?.isVisible
-//        if (s != null) {
-//            updatePlacemarkVisibility(placemark1, !s)
-//        }
-////        getLastKnownLocation()
-////        put()
-//        video.visibility = View.VISIBLE
-//        video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video1)
-////        val media : MediaController = MediaController(this)
-////        media.setAnchorView(video)
-////        video.setMediaController(media)
-//        video.setOnPreparedListener { mp ->
-//            val videoWidth = mp.videoWidth
-//            val videoHeight = mp.videoHeight
-//
-//            val videoViewWidth = video.width
-//            val videoViewHeight = video.height
-//
-//            val layoutParams = video.layoutParams
-//
-//            // Вычислите коэффициенты масштабирования
-//            val widthRatio = videoViewWidth.toFloat() / videoWidth
-//            val heightRatio = videoViewHeight.toFloat() / videoHeight
-//
-//            // Примените минимальный коэффициент масштабирования для масштабирования видео
-//            val scale = widthRatio.coerceAtMost(heightRatio)
-//
-//            layoutParams.width = (videoWidth * scale).toInt()
-//            layoutParams.height = (videoHeight * scale).toInt()
-//
-//            video.layoutParams = layoutParams
-//        }
-//
-//        video.setOnCompletionListener {
-//            video.stopPlayback()
-//            video.visibility = View.INVISIBLE
-//            btnSkip.visibility = View.INVISIBLE
-//        }
-//
-//        video.setOnTouchListener { _, event ->
-//            if (event.action == MotionEvent.ACTION_DOWN) {
-////                    video.stopPlayback()
-////                    video.visibility = View.INVISIBL
-//                if (btnSkip.visibility == View.INVISIBLE)
-//                    btnSkip.visibility = View.VISIBLE
-//                else
-//                    btnSkip.visibility = View.INVISIBLE
-//            }
-//            true
-//        }
-//
-//        video.start()
+        userLocationMarker.geometry = Point(57.736260, 40.921054)
     }
 
     private fun startLocationUpdates() {
@@ -561,8 +460,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
             }
         }
-
-
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
@@ -573,6 +470,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     @SuppressLint("SuspiciousIndentation")
     private fun updateLocationOnMap(location: Point) {
         val userLocation = Point(location.latitude, location.longitude)
+        locationNow = Point(location.latitude, location.longitude)
         if (!isMarkerInitialized) {
             val map = mapView.mapWindow.map
             collection = map.mapObjects.addCollection()
@@ -591,8 +489,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
             isMarkerInitialized = true
         } else {
+            //quest.checkPositionQuest(userLocation)
             userLocationMarker.geometry = userLocation
             userLocationMarker.direction = azimuth
+
         }
         if (isCheckCameraPosition) {
             mapView.map.move(
@@ -707,6 +607,4 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // Implement if sensor accuracy changes are to be handled
     }
-
-
 }

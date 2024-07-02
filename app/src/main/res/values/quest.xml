@@ -25,7 +25,7 @@
         <item name="longitude">40.921054</item>
         <item name="location_name">КГУ</item>
         <item name="text">Здесь ты найдёшь ларец</item>
-        <item name="next_quest">quest1.2</item>
+        <item name="icon_path_white">@drawable/icon_kochei_white</item>
         <item name="icon_path">@drawable/icon_kochei</item>
         <item name="visible">true</item>
         <item name="achievement_name">Хранитель таинственного ларца</item>
@@ -41,7 +41,7 @@
         <item name="longitude">40.914174</item>
         <item name="location_name">Школа</item>
         <item name="text">А здесь сидит кощей. Одолей его и освободи что-то</item>
-        <item name="next_quest"></item>
+        <item name="icon_path_white">@drawable/icon_kochei_white</item>
         <item name="icon_path">@drawable/icon_kochei</item>
         <item name="visible">false</item>
         <item name="achievement_name">Последний вздох Бессмертного</item>
@@ -57,7 +57,7 @@
         <item name="longitude">40.911479</item>
         <item name="location_name">SAD</item>
         <item name="text">Здесь тебя научат уму-разуму и поведают о секретах Соловья-Разбойника</item>
-        <item name="next_quest">quest2.2</item>
+        <item name="icon_path_white">@drawable/icon_kochei_white</item>
         <item name="icon_path">@drawable/icon_solovei</item>
         <item name="visible">true</item>
         <item name="achievement_name">На шаг впереди</item>
@@ -73,7 +73,7 @@
         <item name="longitude">40.908649</item>
         <item name="location_name">Паново</item>
         <item name="text">Нужно тихо пробраться к Соловью, ведь победить его можно только хитростью</item>
-        <item name="next_quest"></item>
+        <item name="icon_path_white">@drawable/icon_kochei_white</item>
         <item name="icon_path">@drawable/icon_solovei</item>
         <item name="visible">false</item>
         <item name="achievement_name">Выбитый зуб</item>
