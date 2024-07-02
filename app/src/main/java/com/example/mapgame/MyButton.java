@@ -52,6 +52,6 @@ public class MyButton extends androidx.appcompat.widget.AppCompatButton {
     //************************************
     public interface MyOnClickListener {
 
-        void OnTouchDigit(MyButton v);
+        void OnTouchDigit(MyButton v) throws InterruptedException;
     }
 }

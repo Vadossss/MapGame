@@ -51,7 +51,7 @@ public class Game {
         bot = new Bot(mMatrix, true);
     }
 
-    public void startGame() {
+    public void startGame() throws InterruptedException {
         activateRawOrColumn(true);
     }
 
@@ -70,7 +70,7 @@ public class Game {
     }
 
     //будем вызывать метод из MainActivity, которая будет следить за нажатиями кнопок с цифрами
-    public void OnUserTouchDigit(int y, int x) {
+    public void OnUserTouchDigit(int y, int x) throws InterruptedException {
 
         mResults.onClick(y, x, true);
         activateRawOrColumn(false);//после хода нужно заблокирвоать доступные кнопки
@@ -88,7 +88,7 @@ public class Game {
     }
 
     //по завершению анимации разрешаем совершить ход боту
-    protected void onAnimationFinished() {
+    protected void onAnimationFinished() throws InterruptedException {
 
         if (!isRow) {//в нашей версии бот играет только за ряды (вертикально)
 
@@ -98,7 +98,11 @@ public class Game {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    botMove(); //
+                    try {
+                        botMove(); //
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }, mTimeToWait / 2);
 
@@ -106,7 +110,7 @@ public class Game {
             activateRawOrColumn(true);
     }
 
-    private void botMove() {
+    private void botMove() throws InterruptedException {
 
         //получаем ход бота
         int botMove = bot.move(playerOnePoints,
@@ -131,7 +135,7 @@ public class Game {
         currentActiveNumb = botMove; //по ходу бота определим, где теперь будет строка
     }
 
-    protected void activateRawOrColumn(final boolean active) {
+    protected void activateRawOrColumn(final boolean active) throws InterruptedException {
 
         int countMovesAllowed = 0; // для определения, есть ли допустимые ходы
 
@@ -222,7 +226,13 @@ public class Game {
             if (activate) //если только что активировали, то теперь нужно деактивировать старое
                 new MyAnimation(y, x, false, row).execute();
             else //теперь, когда завершили деактивацию, дергаем метод завершения анимации
-                onAnimationFinished();
+            {
+                try {
+                    onAnimationFinished();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
         //наш метод для задержки
@@ -235,7 +245,7 @@ public class Game {
         }
     }
 
-    protected void onResult() {
+    protected void onResult() throws InterruptedException {
         //метод интерфеса для отображения результатов
         mResults.onResult(playerOnePoints, playerTwoPoints);
     }

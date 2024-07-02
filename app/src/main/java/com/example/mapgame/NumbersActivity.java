@@ -38,7 +38,7 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.numbers_activity);
+        setContentView(R.layout.Numbers_activity);
 
         mGridLayout = (GridLayout) findViewById(R.id.my_grid);
         mGridLayout.setColumnCount(MATRIX_SIZE);
@@ -82,7 +82,11 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
                 });
 
         game = new Game(this, MATRIX_SIZE); //создаем класс игры
-        game.startGame(); //и запускаем ее
+        try {
+            game.startGame(); //и запускаем ее
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
     }//onCreate
 
@@ -122,7 +126,7 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     //MyButton.MyOnClickListener интерфейс
     //*************************************************************************
     @Override
-    public void OnTouchDigit(MyButton v) {
+    public void OnTouchDigit(MyButton v) throws InterruptedException {
         game.OnUserTouchDigit(v.getIdY(), v.getIdX());
     }
 
