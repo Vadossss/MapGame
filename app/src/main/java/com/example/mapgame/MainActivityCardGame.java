@@ -1,7 +1,9 @@
 package com.example.mapgame;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +16,16 @@ import java.util.List;
 
 public class MainActivityCardGame extends AppCompatActivity {
     private RecyclerView recyclerView;
+    public TextView trsCounter;
     public CardAdapter cardAdapter;
     public List<Card> cardList;
     private int selectedCardPosition = -1;
     private boolean isProcessingTurn = false;
+    public int countHelper = 0;
+    public int moveCount = 20; // Инициализация счетчика ходов
 
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,10 +33,13 @@ public class MainActivityCardGame extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        trsCounter = (TextView)findViewById(R.id.trsCounter);
+        trsCounter.setText(String.valueOf(moveCount));
 
         cardList = generateCards();
         cardAdapter = new CardAdapter(cardList, this::onCardClick);
         recyclerView.setAdapter(cardAdapter);
+
     }
 
     private List<Card> generateCards() {
@@ -46,7 +55,17 @@ public class MainActivityCardGame extends AppCompatActivity {
     }
 
     private void onCardClick(int position) {
-        if (isProcessingTurn) return;
+        if (isProcessingTurn)
+        {
+            return;
+        }
+
+        countHelper++; // Увеличиваем счетчик открытых карт
+        if (countHelper % 2 == 0) {
+            // Уменьшаем счетчик ходов только при каждой второй открытой карте
+            moveCount--;
+            updateMoveCountUI();
+        }
 
         Card clickedCard = cardList.get(position);
         clickedCard.setFaceUp(true);
@@ -78,4 +97,12 @@ public class MainActivityCardGame extends AppCompatActivity {
         selectedCardPosition = -1;
         isProcessingTurn = false;
     }
+    private void updateMoveCountUI() {
+     trsCounter.setText(String.valueOf(moveCount));
+
+
+    }
+
+
+
 }

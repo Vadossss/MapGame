@@ -15,4 +15,14 @@
         android:clipToPadding="false"
         android:layout_margin="16dp" />
 
+    <TextView
+        android:id="@+id/trsCounter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textAlignment="center"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        tools:ignore="MissingConstraints" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
