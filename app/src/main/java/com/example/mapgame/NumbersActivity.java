@@ -29,6 +29,7 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     private static final int MATRIX_SIZE = 5;// можете ставить от 2 до 20))
 
     //ui
+    private nameAntagonist = "Какой-то чел";
     private TextView mUpText, mLowText;
     GridLayout mGridLayout;
     private MyButton[][] mButtons;
@@ -134,7 +135,7 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     //*************************************************************************
     @Override
     public void changeLabel(boolean upLabel, int points) {
-        if (upLabel) mUpText.setText(String.format("Бот: %d", points));
+        if (upLabel) mUpText.setText(String.format("%v: %d",nameAntagonist, points));
         else mLowText.setText(String.valueOf(String.format("Вы: %d", points)));
     }
 
