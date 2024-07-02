@@ -1,9 +1,7 @@
 package com.example.mapgame;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,9 +21,7 @@ import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
-import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
-import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
@@ -79,7 +75,7 @@ public class ArActivity extends AppCompatActivity implements
 
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, MainActivityCardGame.class);
             setResult(RESULT_CANCELED, intent);
             finish();
         });
@@ -96,7 +92,7 @@ public class ArActivity extends AppCompatActivity implements
                     progressValue.setText(String.valueOf(lives));
                     if (lives < 1) {
                         lives = 0;
-                        Intent intent = new Intent(this, MainActivity.class);
+                        Intent intent = new Intent(this, MainActivityCardGame.class);
                         setResult(RESULT_OK, intent);
                         finish();
                     }
