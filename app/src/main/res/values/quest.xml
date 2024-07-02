@@ -31,7 +31,9 @@
         <item name="achievement_name">Хранитель таинственного ларца</item>
         <item name="achievement_text">Найти ларец с погибелю Кощея</item>
         <item name="achievement_icon">@drawable/tree</item>
-        <item name="enemy">Противник: Братки</item>
+        <item name="type_quest">battle</item>
+        <item name="enemy_model">kosheyamin33</item>
+        <item name="enemy_lives">150</item>
     </string-array>
     <string-array name="quest1.2">
         <item name="name">quest1.2</item>
@@ -45,7 +47,9 @@
         <item name="achievement_name">Последний вздох Бессмертного</item>
         <item name="achievement_text">Одолеть Кощея Бессмертного, чья власть простиралась далеко за пределы Тридевятого царства</item>
         <item name="achievement_icon">@drawable/tree</item>
-        <item name="enemy">Противник: Кощей</item>
+        <item name="type_quest">battle</item>
+        <item name="enemy_model">kosheyamin33</item>
+        <item name="enemy_lives">150</item>
     </string-array>
     <string-array name="quest2.1">
         <item name="name">quest2.1</item>
@@ -59,7 +63,9 @@
         <item name="achievement_name">На шаг впереди</item>
         <item name="achievement_text">Узнать секреты Соловья-Разбойника</item>
         <item name="achievement_icon">@drawable/tree</item>
-        <item name="enemy">Противник: Братки</item>
+        <item name="type_quest">battle</item>
+        <item name="enemy_model">kosheyamin33</item>
+        <item name="enemy_lives">200</item>
     </string-array>
     <string-array name="quest2.2">
         <item name="name">quest2.2</item>
@@ -73,6 +79,8 @@
         <item name="achievement_name">Выбитый зуб</item>
         <item name="achievement_text">Победить Соловья-Разбойника</item>
         <item name="achievement_icon">@drawable/tree</item>
-        <item name="enemy">Противник: Кощей</item>
+        <item name="type_quest">battle</item>
+        <item name="enemy_model">kosheyamin33</item>
+        <item name="enemy_lives">200</item>
     </string-array>
 </resources>

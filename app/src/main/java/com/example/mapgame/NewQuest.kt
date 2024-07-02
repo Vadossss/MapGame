@@ -43,6 +43,13 @@ import kotlinx.coroutines.launch
 
 
 class NewQuest {
+
+    companion object {
+        const val QUEST_NAME_BATTLE = "battle"
+        const val QUEST_NAME_MEMO = "memo"
+        const val QUEST_NAME_NUMBERS = "numbers"
+    }
+
     private var map: Map
     private var nameQuest: Int = 0
     lateinit var placemark: PlacemarkMapObject
@@ -62,6 +69,7 @@ class NewQuest {
     private val mainActiv: Activity
     private val activity: MainActivity
     private var resultLauncher: ActivityResultLauncher<Intent>
+    private var typeQuest: String
 
 
 
@@ -85,9 +93,8 @@ class NewQuest {
         questLocation = Point(questInfo[1].toDouble(), questInfo[2].toDouble())
         locationName = questInfo[3]
         questText = questInfo[4]
-//        questNext = questInfo[5]
-        //iconIndex = questInfo[6].toInt()
         questVisible = questInfo[7].toBoolean()
+        typeQuest = questInfo[11]
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
         setVideo()
@@ -129,9 +136,8 @@ class NewQuest {
         questLocation = Point(questInfo[1].toDouble(), questInfo[2].toDouble())
         locationName = questInfo[3]
         questText = questInfo[4]
-//        questNext = questInfo[5]
-        //iconIndex = questInfo[6].toInt()
         questVisible = questInfo[7].toBoolean()
+        typeQuest = questInfo[11]
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
         setVideo()
@@ -193,6 +199,7 @@ class NewQuest {
             placemark = collection.addPlacemark().apply {
                 geometry = questLocation
                 addTapListener(iconTapListen)
+
                 setText(
                     locationName,
                     TextStyle().apply {
@@ -212,6 +219,7 @@ class NewQuest {
                 }
                 isVisible = sharedPreferences.getBoolean(questName+"Visible", false)
             }
+            
         } finally {
             icons.recycle()
         }
@@ -297,14 +305,14 @@ class NewQuest {
 
         DialogManager.addDialog(myDialog)
 
-        val intent = Intent(context, ArActivity::class.java)
+
         val btnClose = mainActiv.findViewById<ImageView>(R.id.btnClose)
         btnClose.setOnClickListener {
             video.stopPlayback()
             fadeOutView()
             video.visibility = View.INVISIBLE
             btnClose.visibility = View.INVISIBLE
-            resultLauncher.launch(intent)
+            checkTypeQuest()
         }
 
         val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
@@ -319,10 +327,9 @@ class NewQuest {
                 video.stopPlayback()
                 fadeOutView()
                 video.visibility = View.INVISIBLE
-                btnClose.visibility = View.INVISIBLE
                 fadeOut(btnClose)
                 fadeInDimmingView()
-                resultLauncher.launch(intent)
+                checkTypeQuest()
             }
 
 
@@ -338,11 +345,19 @@ class NewQuest {
                 }
                 true
             }
+        }
+    }
 
+    private fun checkTypeQuest() {
+        if (typeQuest == QUEST_NAME_BATTLE) {
+            val intent = Intent(context, ArActivity::class.java)
+            intent.putExtra("name", questInfo)
+            resultLauncher.launch(intent)
+        }
+        else if (typeQuest == QUEST_NAME_MEMO) {
 
-
-
-
+        }
+        else if (typeQuest == QUEST_NAME_NUMBERS) {
 
         }
     }

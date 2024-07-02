@@ -60,7 +60,7 @@ public class ArActivity extends AppCompatActivity implements
     private Renderable model;
     private ViewRenderable life_bar;
     private boolean placed = false;
-    private int koshey_model = R.raw.kosheyamin33;
+    private int koshey_model = 0;
 
 
     private Button hit_btn;
@@ -77,6 +77,10 @@ public class ArActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_ar);
         hit_btn = findViewById(R.id.hit_btn);
 
+        Intent intentMain = getIntent();
+        String[] questInfo = intentMain.getStringArrayExtra("name");
+        koshey_model = getResources().getIdentifier(questInfo[12], "raw", getPackageName());
+        lives = Integer.parseInt(questInfo[13]);
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
