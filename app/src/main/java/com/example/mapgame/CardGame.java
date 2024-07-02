@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivityCardGame extends AppCompatActivity {
+public class CardGame extends AppCompatActivity {
     private RecyclerView recyclerView;
     public CardAdapter cardAdapter;
     public List<Card> cardList;
@@ -24,7 +24,7 @@ public class MainActivityCardGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_matching_game);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
 

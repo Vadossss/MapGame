@@ -51,6 +51,10 @@
             android:name=".ArActivity"
 
             />
+        <activity
+            android:name=".CardGame"
+
+            />
     </application>
 
 </manifest>

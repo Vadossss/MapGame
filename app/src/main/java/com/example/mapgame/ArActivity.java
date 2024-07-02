@@ -79,7 +79,7 @@ public class ArActivity extends AppCompatActivity implements
         lives = Integer.parseInt(questInfo[13]);
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivityCardGame.class);
+            Intent intent = new Intent(this, CardGame.class);
             setResult(RESULT_CANCELED, intent);
             finish();
         });
@@ -96,7 +96,7 @@ public class ArActivity extends AppCompatActivity implements
                     progressValue.setText(String.valueOf(lives));
                     if (lives < 1) {
                         lives = 0;
-                        Intent intent = new Intent(this, MainActivityCardGame.class);
+                        Intent intent = new Intent(this, CardGame.class);
                         setResult(RESULT_OK, intent);
                         finish();
                     }

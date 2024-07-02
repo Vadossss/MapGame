@@ -355,7 +355,8 @@ class NewQuest {
             resultLauncher.launch(intent)
         }
         else if (typeQuest == QUEST_NAME_MEMO) {
-
+            val intent = Intent(context, CardGame::class.java)
+            resultLauncher.launch(intent)
         }
         else if (typeQuest == QUEST_NAME_NUMBERS) {
 
