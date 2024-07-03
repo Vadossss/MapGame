@@ -31,9 +31,10 @@
         <item name="achievement_name">Хранитель таинственного ларца</item>
         <item name="achievement_text">Найти ларец с погибелю Кощея</item>
         <item name="achievement_icon">@drawable/tree</item>
-        <item name="type_quest">memo</item>
+        <item name="type_quest">numbers</item>
         <item name="enemy_model">kosheyamin33</item>
         <item name="enemy_lives">150</item>
+        <item name="video">kot</item>
     </string-array>
     <string-array name="quest1.2">
         <item name="name">quest1.2</item>
@@ -50,6 +51,7 @@
         <item name="type_quest">battle</item>
         <item name="enemy_model">kosheyamin33</item>
         <item name="enemy_lives">150</item>
+        <item name="video">koshei</item>
     </string-array>
     <string-array name="quest2.1">
         <item name="name">quest2.1</item>
@@ -63,9 +65,10 @@
         <item name="achievement_name">На шаг впереди</item>
         <item name="achievement_text">Узнать секреты Соловья-Разбойника</item>
         <item name="achievement_icon">@drawable/tree</item>
-        <item name="type_quest">numbers</item>
+        <item name="type_quest">memo</item>
         <item name="enemy_model">kosheyamin33</item>
         <item name="enemy_lives">200</item>
+        <item name="video">solovei</item>
     </string-array>
     <string-array name="quest2.2">
         <item name="name">quest2.2</item>
@@ -82,5 +85,6 @@
         <item name="type_quest">battle</item>
         <item name="enemy_model">kosheyamin33</item>
         <item name="enemy_lives">200</item>
+        <item name="video">solovei</item>
     </string-array>
 </resources>

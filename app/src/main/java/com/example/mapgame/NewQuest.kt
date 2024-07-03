@@ -71,9 +71,7 @@ class NewQuest {
     private var resultLauncher: ActivityResultLauncher<Intent>
     private var typeQuest: String
     var dialogShow: Boolean = false
-        get() {
-            return field
-        }
+    private var videoPath: Int
 
 
     private lateinit var collection: MapObjectCollection
@@ -105,6 +103,7 @@ class NewQuest {
         typeQuest = questInfo[11]
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
+        videoPath = context.getResources().getIdentifier(questInfo[12], "raw", context.packageName)
         setVideo()
         this.activity = activity
         resultLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -148,6 +147,7 @@ class NewQuest {
         typeQuest = questInfo[11]
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
+        videoPath = context.getResources().getIdentifier(questInfo[14], "raw", context.packageName)
         setVideo()
         this.activity = activity
         resultLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -177,7 +177,7 @@ class NewQuest {
     }
 
     private fun setVideo() {
-        video.setVideoPath("android.resource://" + context.packageName + "/" + R.raw.video1)
+        video.setVideoPath("android.resource://" + context.packageName + "/" + videoPath)
 
         video.setOnPreparedListener {
             val layoutParams = video.layoutParams
@@ -307,6 +307,7 @@ class NewQuest {
 
     @SuppressLint("ClickableViewAccessibility")
     fun newDialog() {
+        val fade = FadePressets(context, mainActiv)
         DialogManager.closeAllDialogs()
         val dialogBinding = LayoutInflater.from(context).inflate(R.layout.dialog_enemy, null)
         val myDialog = Dialog(context)
@@ -326,7 +327,7 @@ class NewQuest {
         val btnClose = mainActiv.findViewById<ImageView>(R.id.btnClose)
         btnClose.setOnClickListener {
             video.stopPlayback()
-            fadeOutView()
+            fade.fadeOutView()
             video.visibility = View.INVISIBLE
             btnClose.visibility = View.INVISIBLE
             checkTypeQuest()
@@ -334,18 +335,17 @@ class NewQuest {
 
         val btnBattle = dialogBinding.findViewById<Button>(R.id.btnBattle)
         btnBattle.setOnClickListener {
-            fadeInDimmingView()
+            fade.fadeInDimmingView()
             video.start()
             video.visibility = View.VISIBLE
-
             myDialog.dismiss()
 
             video.setOnCompletionListener {
                 video.stopPlayback()
-                fadeOutView()
+                fade.fadeOutView()
                 video.visibility = View.INVISIBLE
-                fadeOut(btnClose)
-                fadeInDimmingView()
+                fade.fadeOut(btnClose)
+                fade.fadeInDimmingView()
                 checkTypeQuest()
             }
 
@@ -354,10 +354,15 @@ class NewQuest {
             video.setOnTouchListener {_, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     if (btnClose.visibility == View.INVISIBLE) {
-                        fadeIn(btnClose)
+                        fade.fadeIn(btnClose)
+                        val scope = CoroutineScope(Dispatchers.Main)
+                        scope.launch {
+                            delay(3000)
+                            fade.fadeOut(btnClose)
+                        }
                     }
                     else {
-                        fadeOut(btnClose)
+                        fade.fadeOut(btnClose)
                     }
                 }
                 true

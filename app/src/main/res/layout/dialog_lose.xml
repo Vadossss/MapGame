@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="343dp"
+        android:layout_height="293dp"
+        android:backgroundTint="#FFFFFF"
+        app:cardBackgroundColor="#FF0C0C"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/locationQuest"
+                android:layout_width="342dp"
+                android:layout_height="53dp"
+                android:layout_weight="1"
+                android:autoText="true"
+                android:elegantTextHeight="false"
+                android:gravity="center"
+                android:text="Это соловей разбойник"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.008"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:id="@+id/questText"
+                android:layout_width="340dp"
+                android:layout_height="146dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="TextView"
+                android:textColor="#000000"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.666"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.428" />
+
+            <Button
+                android:id="@+id/btnBattle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#3D8E1A"
+                android:text="Вернуться на карту"
+                android:textColor="#FFFFFF"
+                android:textColorLink="#FFFFFF"
+                android:textSize="12dp"
+                app:cornerRadius="20px"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.921"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.893" />
+
+            <Button
+                android:id="@+id/btnReboot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#3D8E1A"
+                android:text="Начать заново"
+                android:textColor="#FFFFFF"
+                android:textColorLink="#FFFFFF"
+                android:textSize="13dp"
+                app:cornerRadius="20px"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.081"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.893" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

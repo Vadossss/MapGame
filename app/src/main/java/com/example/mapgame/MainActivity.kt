@@ -403,6 +403,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onResume()
 
 
+
+        accelerometer?.also { sensor ->
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
+        }
+        magnetometer?.also { sensor ->
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
+        }
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -417,12 +425,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
 
-        accelerometer?.also { sensor ->
-            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
-        }
-        magnetometer?.also { sensor ->
-            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
-        }
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -450,8 +453,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         val locationRequest = LocationRequest.create().apply {
-            interval = 2000 // 10 секунд
-            fastestInterval = 2000 // 5 секунд
+            interval = 1000 // 10 секунд
+            fastestInterval = 1000 // 5 секунд
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         Log.d(TAG, "startLocationUpdates")
@@ -495,6 +498,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         } else {
             quest.checkPositionQuest(userLocation)
             userLocationMarker.geometry = userLocation
+
+//            for (i in oldAzimuth.toInt() until azimuth.toInt()) {
+//                Log.d("UpdateLocationOnMap", "Loop iteration: $i")
+//                userLocationMarker.direction = i.toFloat()
+//                if (isCheckCameraPosition) {
+//                    mapView.map.move(
+//                        CameraPosition(locationNow, 17.0f, i.toFloat(), 100f),
+//                        Animation(Animation.Type.SMOOTH, 1f),
+//                        null
+//                    )
+//                }
+//            }
             userLocationMarker.direction = azimuth
 
         }
@@ -600,6 +615,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
         }
 
+
+
+
+
+
         if (SensorManager.getRotationMatrix(r, i, gravity, geomagnetic)) {
             val orientation = FloatArray(3)
             SensorManager.getOrientation(r, orientation)
@@ -607,9 +627,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             azimuth = (azimuth + 360) % 360
             //Log.d("Azimuth", "Current azimuth: $azimuth")
         }
+//        val coroutineScope = CoroutineScope(Dispatchers.Main)
+//        coroutineScope.launch {
+//
+//
+//            if (isMarkerInitialized) {
+//                Log.d("UpdateLocationOnMap", "Loop iteration: " + event.values[2])
+//                userLocationMarker.direction = azimuth
+//                if (isCheckCameraPosition) {
+//                    mapView.map.move(
+//                        CameraPosition(locationNow, 17.0f, azimuth, 100f),
+//                        Animation(Animation.Type.SMOOTH, 1f),
+//                        null
+//                    )
+//                }
+//            }
+//            delay(10000)
+//        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // Implement if sensor accuracy changes are to be handled
+
+
+
     }
 }

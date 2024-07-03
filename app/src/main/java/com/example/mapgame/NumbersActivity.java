@@ -1,9 +1,19 @@
 package com.example.mapgame;
 
+import static android.content.ContentValues.TAG;
+import static kotlinx.coroutines.DelayKt.delay;
+
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
@@ -11,13 +21,18 @@ import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.Dispatchers;
 
 public class NumbersActivity extends AppCompatActivity implements Game.ResultsCallback, MyButton.MyOnClickListener{
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -29,10 +44,12 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     private static final int MATRIX_SIZE = 5;// можете ставить от 2 до 20))
 
     //ui
-    private String nameAntagonist = "Какой-то чел";
+    private String nameAntagonist = "Кот учёный";
     private TextView mUpText, mLowText;
     GridLayout mGridLayout;
     private MyButton[][] mButtons;
+    private VideoView videoDialog;
+    private Button btnSkip;
 
     private Game game;
 
@@ -45,6 +62,16 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
         mGridLayout.setColumnCount(MATRIX_SIZE);
         mGridLayout.setRowCount(MATRIX_SIZE);
         mButtons = new MyButton[MATRIX_SIZE][MATRIX_SIZE];//5 строк и 5 рядов
+        videoDialog = (VideoView) findViewById(R.id.videoDialog);
+        btnSkip = (Button) findViewById(R.id.btnSkipQuest);
+        TextView name_enemy = (TextView) findViewById(R.id.upper_scoreboard);
+        name_enemy.setText(String.format("%s: %d",nameAntagonist, 0));
+        ImageView btnClose = (ImageView) findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CardGameActivity.class);
+            setResult(RESULT_CANCELED, intent);
+            finish();
+        });
 
         //создаем кнопки для цифр
         for (int yPos = 0; yPos < MATRIX_SIZE; yPos++) {
@@ -83,6 +110,15 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
                 });
 
         game = new Game(this, MATRIX_SIZE); //создаем класс игры
+
+        btnSkip.setOnClickListener(v -> {
+            try {
+                game.onResult();
+                btnSkip.setVisibility(View.INVISIBLE);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
         try {
             game.startGame(); //и запускаем ее
         } catch (InterruptedException e) {
@@ -166,31 +202,132 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
 
         String text;
         int result = -999;
+        String questText;
+        Integer path;
         if (playerOnePoints > playerTwoPoints)
         {
-            text = "вы победили";
+            text = "Вы победили!";
+            videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.kot_win);
+            questText = "Теперь вы готовы идти дальше и сразиться с Кощеем";
             result = RESULT_OK;
+            path = R.layout.dialog_enemy;
         }
         else if (playerOnePoints < playerTwoPoints)
         {
-            text = "бот победил";
+            text = "Кот-учёный победил!";
+            videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.kot_lose);
+            questText = "Не расстраивайся. В следующий раз повезёт!";
             result = RESULT_CANCELED;
+            path = R.layout.dialog_lose;
         }
         else
         {
-            text = "ничья";
+            text = "Ничья!";
+            videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.kot_lose);
+            questText = "Не расстраивайся. В следующий раз повезёт!";
             result = RESULT_CANCELED;
+            path = R.layout.dialog_lose;
         }
-
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-
-        TimeUnit.SECONDS.sleep(2);
-        // Завершаем игру, отправляем данные на след страницу
         int finalResult = result;
-        Intent intent = new Intent(this, CardGameActivity.class);
-        setResult(finalResult, intent);
-        finish();
+        videoDialog.setOnPreparedListener( v-> {
+            ViewGroup.LayoutParams layoutParams = videoDialog.getLayoutParams();
+            View d = (View)findViewById(R.id.lay);
+            layoutParams.width = d.getLayoutParams().width;
+            layoutParams.height = d.getLayoutParams().height;
+            videoDialog.setLayoutParams(layoutParams);
+            videoDialog.setClickable(true);
+            videoDialog.setFocusable(true);
+        });
+        videoDialog.start();
+        videoDialog.setVisibility(View.VISIBLE);
+        FadePressets fade = new FadePressets(this, this);
+        ImageView btnClose = (ImageView) findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v -> {
+            videoDialog.stopPlayback();
+            fade.fadeOutView();
+            videoDialog.setVisibility(View.INVISIBLE);
+            btnClose.setVisibility(View.INVISIBLE);
+            startDialog(text, finalResult, questText, path);
+        });
 
+        videoDialog.setOnClickListener(v -> {
+
+
+                    Log.d(TAG, "Action Down Detected");
+                    if (btnClose.getVisibility() == View.INVISIBLE) {
+                        fade.fadeIn(btnClose);
+                        Log.d("TouchEvent", "Fading In");
+//                        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+//                            try {
+//                                // Симуляция длительной задачи
+//                                Thread.sleep(3000);
+//                                fade.fadeOut(btnClose);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                        });
+//                        future.join();
+                    }
+                    else {
+                        fade.fadeOut(btnClose);
+                        Log.d("TouchEvent", "Fading Out");
+                    }
+
+            }
+        );
+
+        //Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        TimeUnit.SECONDS.sleep(2);
+
+        videoDialog.setOnCompletionListener( v -> {
+            videoDialog.stopPlayback();
+            fade.fadeOutView();
+            videoDialog.setVisibility(View.INVISIBLE);
+            fade.fadeOut(btnClose);
+            fade.fadeInDimmingView();
+            startDialog(text, finalResult, questText, path);
+        });
+
+        // Завершаем игру, отправляем данные на след страницу
+
+//        Intent intent = new Intent(this, CardGameActivity.class);
+//        setResult(finalResult, intent);
+//        finish();
+
+    }
+
+    private void startDialog(String text, int finalResult, String questText, Integer path) {
+        View dialog = new View(this);
+        dialog = LayoutInflater.from(this).inflate(path, null);
+        Dialog myDialog = new Dialog(this);
+        TextView textDialog =  (TextView) dialog.findViewById(R.id.locationQuest);
+        textDialog.setText(text);
+        myDialog.setContentView(dialog);
+        myDialog.setCancelable(false);
+        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        myDialog.getWindow().setWindowAnimations(R.style.dialog_animation_fade);
+        myDialog.show();
+        TextView questTextView = (TextView) dialog.findViewById(R.id.questText);
+        questTextView.setText(questText);
+        Button button = (Button) dialog.findViewById(R.id.btnBattle);
+        Button buttonReboot = (Button) dialog.findViewById(R.id.btnReboot);
+        buttonReboot.setOnClickListener(v -> {
+            myDialog.dismiss();
+            Intent intent = new Intent(this, NumbersActivity.class);
+            startActivity(intent);
+            finish();
+        });
+        button.setText("Вернуться на карту");
+        button.setOnClickListener(v -> {
+            myDialog.dismiss();
+            finishGame(finalResult);
+        });
+    }
+
+    private void finishGame(int resultCode) {
+        Intent intent = new Intent(this, MainActivity.class);
+        setResult(resultCode, intent);
+        finish();
     }
 
     @Override
