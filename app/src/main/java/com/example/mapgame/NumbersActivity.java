@@ -29,7 +29,7 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     private static final int MATRIX_SIZE = 5;// можете ставить от 2 до 20))
 
     //ui
-    private nameAntagonist = "Какой-то чел";
+    private String nameAntagonist = "Какой-то чел";
     private TextView mUpText, mLowText;
     GridLayout mGridLayout;
     private MyButton[][] mButtons;
@@ -39,7 +39,7 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.Numbers_activity);
+        setContentView(R.layout.numbers_activity);
 
         mGridLayout = (GridLayout) findViewById(R.id.my_grid);
         mGridLayout.setColumnCount(MATRIX_SIZE);
@@ -135,7 +135,7 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
     //*************************************************************************
     @Override
     public void changeLabel(boolean upLabel, int points) {
-        if (upLabel) mUpText.setText(String.format("%v: %d",nameAntagonist, points));
+        if (upLabel) mUpText.setText(String.format("%s: %d",nameAntagonist, points));
         else mLowText.setText(String.valueOf(String.format("Вы: %d", points)));
     }
 

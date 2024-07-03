@@ -200,11 +200,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 setMessage("Вы уверены, что хотите начать новую игру? Прогресс текущего прохождения будет утерян.")
                 setPositiveButton("Да") { dialog, _ ->
                     // Очищаем данные и сбрасываем квесты при подтверждении
+                    val flag = sharedPreferences.getBoolean("nightTheme", false)
                     val editor = sharedPreferences.edit()
                     editor.clear()
                     editor.apply()
                     quest.resetQuests()
                     dialog.dismiss()
+                    editor.putBoolean("nightTheme", flag)
+                    editor.apply()
                 }
                 setNegativeButton("Нет") { dialog, _ ->
                     // Закрываем диалог при отказе
@@ -399,6 +402,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onResume() {
         super.onResume()
 
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -489,7 +493,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
             isMarkerInitialized = true
         } else {
-            //quest.checkPositionQuest(userLocation)
+            quest.checkPositionQuest(userLocation)
             userLocationMarker.geometry = userLocation
             userLocationMarker.direction = azimuth
 
@@ -500,6 +504,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
+
 //            if ((oldAzimuth - azimuth) > 20 && azimuth > 20 && azimuth < 340) {
 //                mapView.map.move(
 //                    CameraPosition(locationNow, 17.0f, oldAzimuth+20, 100f),

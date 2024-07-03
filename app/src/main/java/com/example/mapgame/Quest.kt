@@ -123,14 +123,16 @@ class Quest(private var activity: MainActivity, private var context: Context, pr
         val results = FloatArray(1)
         Log.d(TAG, "Отладка")
         questList.flatten().forEach { quest ->
-            Location.distanceBetween(
-                userLocation.latitude, userLocation.longitude,
-                quest.placemark.geometry.latitude, quest.placemark.geometry.longitude,
-                results
-            )
-
-            if (results[0] < radius) {
-                quest.newDialog()
+            if (!quest.dialogShow) {
+                Location.distanceBetween(
+                    userLocation.latitude, userLocation.longitude,
+                    quest.placemark.geometry.latitude, quest.placemark.geometry.longitude,
+                    results
+                )
+                if (results[0] < radius) {
+                    quest.dialogShow = true
+                    quest.newDialog()
+                }
             }
         }
 

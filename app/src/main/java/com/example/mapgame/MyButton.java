@@ -32,7 +32,11 @@ public class MyButton extends androidx.appcompat.widget.AppCompatButton {
     public boolean performClick() {
         super.performClick();
 
-        mClickListener.OnTouchDigit(this);//будем дергать метод интерфейса
+        try {
+            mClickListener.OnTouchDigit(this);//будем дергать метод интерфейса
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return true;
     }
 

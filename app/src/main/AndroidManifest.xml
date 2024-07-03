@@ -55,6 +55,10 @@
             android:name=".CardGameActivity"
 
             />
+        <activity
+            android:name=".NumbersActivity"
+
+            />
     </application>
 
 </manifest>

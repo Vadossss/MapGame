@@ -56,13 +56,13 @@ public class ArActivity extends AppCompatActivity implements
     private Renderable model;
     private ViewRenderable life_bar;
     private boolean placed = false;
-    private int koshey_model = 0;
+    private int enemy_model = 0;
 
 
     private Button hit_btn;
     public ProgressBar progressBar;
     public TextView progressValue;
-    private int lives = 100; // Изначальное количество "жизней"
+    private int lives; // Изначальное количество "жизней"
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +75,7 @@ public class ArActivity extends AppCompatActivity implements
 
         Intent intentMain = getIntent();
         String[] questInfo = intentMain.getStringArrayExtra("name");
-        koshey_model = getResources().getIdentifier(questInfo[12], "raw", getPackageName());
+        enemy_model = getResources().getIdentifier(questInfo[12], "raw", getPackageName());
         lives = Integer.parseInt(questInfo[13]);
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
@@ -150,7 +150,7 @@ public class ArActivity extends AppCompatActivity implements
     public void loadModels() {
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
         ModelRenderable.builder()
-                .setSource(this, koshey_model)
+                .setSource(this, enemy_model)
                 .setIsFilamentGltf(true)
                 .setAsyncLoadEnabled(true)
                 .build()
@@ -165,7 +165,6 @@ public class ArActivity extends AppCompatActivity implements
                             this, "Unable to load model", Toast.LENGTH_LONG).show();
                     return null;
                 });
-
 
         ViewRenderable.builder()
                 .setView(this, R.layout.lives)
@@ -221,6 +220,7 @@ public class ArActivity extends AppCompatActivity implements
                                     enemy_lives.setEnabled(true);
 
                                     progressBar = life_bar.getView().findViewById(R.id.progressBar);
+                                    progressBar.setMax(lives);
                                     progressValue = life_bar.getView().findViewById(R.id.textViewProgress);
                                     progressValue.setText(String.valueOf(lives));
                                     progressBar.setProgress(lives);

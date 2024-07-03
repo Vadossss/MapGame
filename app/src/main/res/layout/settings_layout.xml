@@ -11,6 +11,7 @@
         android:backgroundTint="#FFFFFF"
         android:outlineSpotShadowColor="#000000"
         app:cardBackgroundColor="#FF0C0C"
+        app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,6 +21,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="153dp"
+                android:layout_height="49dp"
+                android:text="Настройки"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.063" />
 
             <Button
                 android:id="@+id/button2"
@@ -43,6 +57,22 @@
                 app:layout_constraintVertical_bias="0.101" />
 
             <Button
+                android:id="@+id/btn_theme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#000000"
+                android:text="Сменить тему карты"
+                android:textColor="#FFFFFF"
+                android:textColorLink="#FFFFFF"
+                app:cornerRadius="25px"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.286"
+                app:rippleColor="#FFFFFF" />
+
+            <Button
                 android:id="@+id/btnNewGame"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,23 +86,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.371"
-                app:rippleColor="#FFFFFF" />
-
-            <Button
-                android:id="@+id/btn_theme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#000000"
-                android:text="Сменить тему карты"
-                android:textColor="#FFFFFF"
-                android:textColorLink="#FFFFFF"
-                app:cornerRadius="25px"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.154"
+                app:layout_constraintVertical_bias="0.508"
                 app:rippleColor="#FFFFFF" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

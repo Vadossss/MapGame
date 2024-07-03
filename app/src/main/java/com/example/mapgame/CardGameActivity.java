@@ -1,8 +1,15 @@
 package com.example.mapgame;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -32,8 +39,8 @@ public class CardGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_matching_game);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
-        trsCounter = (TextView)findViewById(R.id.trsCounter);
-        trsCounter.setText(String.valueOf(moveCount));
+        trsCounter = (TextView)findViewById(R.id.scoreboard);
+        trsCounter.setText("Ходы: "+ moveCount);
 
         cardList = generateCards();
         cardAdapter = new CardAdapter(cardList, this::onCardClick);
@@ -79,7 +86,22 @@ public class CardGameActivity extends AppCompatActivity {
                 selectedCard.setMatched(true);
                 clickedCard.setMatched(true);
                 if (allCardsMatched()) {
-                    finishGame(RESULT_OK);
+                    View dialog = new View(this);
+                    dialog = LayoutInflater.from(this).inflate(R.layout.dialog_enemy, null);
+                    Dialog myDialog = new Dialog(this);
+                    TextView text =  (TextView) dialog.findViewById(R.id.locationQuest);
+                    text.setText("Вы выиграли!");
+                    myDialog.setContentView(dialog);
+                    myDialog.setCancelable(false);
+                    myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    myDialog.getWindow().setWindowAnimations(R.style.dialog_animation_fade);
+                    myDialog.show();
+
+                    Button button = (Button) dialog.findViewById(R.id.btnBattle);
+                    button.setOnClickListener(v -> {
+                        myDialog.dismiss();
+                        finishGame(RESULT_OK);
+                    });
                 }
                 else {
                     resetTurn();
@@ -96,7 +118,23 @@ public class CardGameActivity extends AppCompatActivity {
         }
 
         if (moveCount == 0 && !allCardsMatched()) {
-            finishGame(RESULT_CANCELED);
+            View dialog = new View(this);
+            dialog = LayoutInflater.from(this).inflate(R.layout.dialog_enemy, null);
+            Dialog myDialog = new Dialog(this);
+            TextView text =  (TextView) dialog.findViewById(R.id.locationQuest);
+            text.setText("Вы проиграли!");
+            myDialog.setContentView(dialog);
+            myDialog.setCancelable(false);
+            myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            myDialog.getWindow().setWindowAnimations(R.style.dialog_animation_fade);
+            myDialog.show();
+
+            Button button = (Button) dialog.findViewById(R.id.btnBattle);
+            button.setOnClickListener(v -> {
+                myDialog.dismiss();
+                finishGame(RESULT_CANCELED);
+            });
+
         }
     }
 
@@ -121,6 +159,6 @@ public class CardGameActivity extends AppCompatActivity {
     }
 
     private void updateMoveCountUI() {
-        trsCounter.setText(String.valueOf(moveCount));
+        trsCounter.setText("Ходы: "+ moveCount);
     }
 }

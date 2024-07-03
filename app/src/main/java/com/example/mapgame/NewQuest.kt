@@ -70,7 +70,10 @@ class NewQuest {
     private val activity: MainActivity
     private var resultLauncher: ActivityResultLauncher<Intent>
     private var typeQuest: String
-
+    var dialogShow: Boolean = false
+        get() {
+            return field
+        }
 
 
     private lateinit var collection: MapObjectCollection
@@ -373,7 +376,8 @@ class NewQuest {
             resultLauncher.launch(intent)
         }
         else if (typeQuest == QUEST_NAME_NUMBERS) {
-
+            val intent = Intent(context, NumbersActivity::class.java)
+            resultLauncher.launch(intent)
         }
     }
 
