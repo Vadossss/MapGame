@@ -24,16 +24,163 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/arFragment"
             android:layout_width="match_parent"
-            android:layout_height="602dp"
+            android:layout_height="466dp"
             android:backgroundTint="#00E30E0E" />
 
-        <Button
-            android:id="@+id/hit_btn"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Удар"
-            android:textSize="24sp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="50">
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/plus" />
+
+                <ProgressBar
+                    android:id="@+id/hp"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="15dp"
+
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_weight="49"
+                    android:maxWidth="60dip"
+                    android:maxHeight="20dip"
+                    android:min="0"
+                    android:minHeight="20dip"
+                    android:progressDrawable="@android:drawable/progress_horizontal"
+                    android:progressTint="#45B500"
+                    android:textAlignment="center"
+                    tools:ignore="MissingConstraints" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="50">
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/biseps" />
+
+                <ProgressBar
+                    android:id="@+id/mana"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="15dp"
+
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_weight="49"
+                    android:max="280"
+                    android:maxWidth="60dip"
+                    android:maxHeight="20dip"
+                    android:min="0"
+                    android:minHeight="20dip"
+                    android:progressDrawable="@android:drawable/progress_horizontal"
+                    android:progressTint="#0180C5"
+                    android:textAlignment="center"
+                    tools:ignore="MissingConstraints" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#000000"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/rej_1"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:textColorHighlight="#656464"
+                        app:backgroundTint="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/rej_2"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:textColorHighlight="#656464"
+                        app:backgroundTint="#FFFFFF" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/hit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:text="УДАР" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/rej_3"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:textColorHighlight="#656464"
+                        app:backgroundTint="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/rej_4"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:textColorHighlight="#656464"
+                        app:backgroundTint="#FFFFFF" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
+
+    <VideoView
+        android:id="@+id/cut_scene"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
