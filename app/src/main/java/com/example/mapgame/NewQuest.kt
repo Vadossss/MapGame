@@ -334,17 +334,20 @@ class NewQuest {
         val myDialog = Dialog(context)
         val nameAchievement = achievementWindow.findViewById<TextView>(R.id.achieveName)
         val textAchievement = achievementWindow.findViewById<TextView>(R.id.achieveText)
+        val image = achievementWindow.findViewById<ImageView>(R.id.imageAchiv)
         myDialog.setContentView(achievementWindow)
         myDialog.setCancelable(false)
-        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.BLACK))
+        myDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         myDialog.window?.setDimAmount(0F)
 
         myDialog.window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
         myDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         myDialog.window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
-
+        val icons = context.resources.obtainTypedArray(nameQuest)
+        val selectedIconResId = icons.getResourceId(10, -1)
         nameAchievement.text = questInfo[8]
         textAchievement.text = questInfo[9]
+        image.setImageResource(selectedIconResId)
         val params= myDialog.window?.attributes
         params?.gravity = Gravity.TOP
         params?.y = 50

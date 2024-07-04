@@ -4,15 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="0dp"
+    android:foregroundTint="#FF9393"
     android:outlineAmbientShadowColor="#EF0000"
-    android:outlineProvider="background"
+    android:outlineProvider="none"
     android:outlineSpotShadowColor="#FF0000"
     app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="345dp"
-        android:layout_height="62dp">
+        android:layout_height="62dp"
+        android:backgroundTint="#FF0000"
+        android:foregroundTint="#FF0000">
 
         <TextView
             android:id="@+id/achieveName"
@@ -24,7 +27,7 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="0.04"
             app:layout_constraintStart_toEndOf="@+id/imageAchiv"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
@@ -47,8 +50,8 @@
 
         <ImageView
             android:id="@+id/imageAchiv"
-            android:layout_width="71dp"
-            android:layout_height="77dp"
+            android:layout_width="69dp"
+            android:layout_height="61dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/achieveText"

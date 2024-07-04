@@ -21,10 +21,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -153,13 +155,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 val selectedIconResId = icons.getResourceId(iconIndex, -1)
                 Log.d(TAG, "Имя: " + questInfo[0])
                 if (sharedPreferences.getBoolean(questInfo[0], false)) {
+
+                    achievements.add(Achievement(questInfo[8], questInfo[9], selectedIconResId))
                     Log.d(TAG,
-                        "Проверка значений: " + sharedPreferences.getBoolean(questInfo[0], false)
+                        "Проверка размерности: " + achievements.size
                             .toString()
                     )
-                    achievements.add(Achievement(questInfo[8], questInfo[9], selectedIconResId))
                 }
             }
+        }
+        if (achievements.size == 4) {
+            achievements.add(Achievement("Спаситель слободы", "Освободить все достопримечательности", R.drawable.spasitel))
         }
 
         // Пример списка достижений
@@ -167,7 +173,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         achieveList.adapter = AchievementAdapter(achievements) { achievement ->
             // Обработка клика по элементу достижения
-            Toast.makeText(this, "Clicked: ${achievement.name}", Toast.LENGTH_SHORT).show()
+            val achievementImage = LayoutInflater.from(this).inflate(R.layout.achievement_image, null)
+            val dialog = Dialog(this)
+            //val textQuest = achievementWindow.findViewById<TextView>(R.id.textQuest)
+            dialog.setContentView(achievementImage)
+            dialog.setCancelable(true)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setWindowAnimations(R.style.dialog_animation_fade)
+            val image = achievementImage.findViewById<ImageView>(R.id.imageView)
+            image.setImageResource(achievement.imageResId)
+            dialog.show()
         }
         //textQuest.text = questText
         myDialog.show()

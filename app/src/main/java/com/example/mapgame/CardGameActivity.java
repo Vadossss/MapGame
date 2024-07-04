@@ -147,6 +147,8 @@ public class CardGameActivity extends AppCompatActivity {
                 dialog = LayoutInflater.from(this).inflate(R.layout.dialog_lose, null);
                 Dialog myDialog = new Dialog(this);
                 TextView text = (TextView) dialog.findViewById(R.id.locationQuest);
+                TextView questText = (TextView) dialog.findViewById(R.id.questText);
+                questText.setText("Не расстраивайся. В следующий раз повезёт!");
                 text.setText("Вы проиграли!");
                 myDialog.setContentView(dialog);
                 myDialog.setCancelable(false);

@@ -174,7 +174,7 @@ public class ArActivity extends AppCompatActivity implements
                     {
                         mana -= 70;
                         player_mana.setProgress(mana);
-                        if(mana < 1)
+                        if(mana < 1 && lives>0)
                         {
                             time_count = 0;
                             touched=false;
@@ -202,7 +202,7 @@ public class ArActivity extends AppCompatActivity implements
                                                     pl_lives -= 20;
                                                     player_hp.setProgress(pl_lives);
                                                     if (pl_lives < 1) {
-
+                                                        timer.cancel();
                                                         looseDialog();
 
                                                     }
@@ -253,6 +253,7 @@ public class ArActivity extends AppCompatActivity implements
         loadModels();
 
     }
+
 
     @Override
     public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
@@ -387,7 +388,7 @@ public class ArActivity extends AppCompatActivity implements
         String questName = questInfo[0];
         if(questName =="quest1.2")
         {
-            videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.koshei_lose);
+            videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.koshei_win);
         }
         else {
             videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.solovei_lose2);
@@ -396,27 +397,29 @@ public class ArActivity extends AppCompatActivity implements
         setVideo();
 
         videoDialog.setOnCompletionListener( s -> {
-
             View dialog = new View(this);
-            dialog = LayoutInflater.from(this).inflate(R.layout.dialog_lose, null);
+            dialog = LayoutInflater.from(this).inflate(R.layout.dialog_enemy, null);
             Dialog myDialog = new Dialog(this);
             TextView text = (TextView) dialog.findViewById(R.id.locationQuest);
+            TextView questText = (TextView) dialog.findViewById(R.id.questText);
             text.setText("Вы проиграли!");
+            questText.setText("Не расстраивайтесь, наберитесь сил и возвращайтесь ещё сильнее!");
             myDialog.setContentView(dialog);
             myDialog.setCancelable(false);
             myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             myDialog.getWindow().setWindowAnimations(R.style.dialog_animation_fade);
             myDialog.show();
 
-            Button buttonReboot = (Button) dialog.findViewById(R.id.btnReboot);
-            buttonReboot.setOnClickListener(v -> {
-                myDialog.dismiss();
-                Intent intent = new Intent(this, ArActivity.class);
-                startActivity(intent);
-                finish();
-            });
+//            Button buttonReboot = (Button) dialog.findViewById(R.id.btnReboot);
+//            buttonReboot.setOnClickListener(v -> {
+//                myDialog.dismiss();
+//                Intent intent = new Intent(this, ArActivity.class);
+//                startActivity(intent);
+//                finish();
+//            });
 
             Button button = (Button) dialog.findViewById(R.id.btnBattle);
+            button.setText("Выйти на карту");
             button.setOnClickListener(v -> {
                 myDialog.dismiss();
                 finishGame(RESULT_CANCELED);
@@ -428,9 +431,9 @@ public class ArActivity extends AppCompatActivity implements
         FadePressets fade = new FadePressets(this, this);
         fade.fadeInDimmingView();
         String questName = questInfo[0];
-        if(questName =="quest1.2")
+        if(questName.equals("quest1.2"))
         {
-            videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.koshei_win);
+            videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.koshei_lose);
         }
         else {
             videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.solovei_win2);
@@ -467,7 +470,7 @@ public class ArActivity extends AppCompatActivity implements
     private void setVideo() {
         videoDialog.setOnPreparedListener( v-> {
             ViewGroup.LayoutParams layoutParams = videoDialog.getLayoutParams();
-            View d = (View)findViewById(R.id.main);
+            View d = (View)findViewById(R.id.lay);
             layoutParams.width = d.getLayoutParams().width;
             layoutParams.height = d.getLayoutParams().height;
             videoDialog.setLayoutParams(layoutParams);
