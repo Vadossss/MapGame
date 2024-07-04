@@ -208,13 +208,13 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
         {
             text = "Вы победили!";
             videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.kot_win);
-            questText = "Теперь вы готовы идти дальше и сразиться с Кощеем";
+            questText = "Кот учёный поделился ларцом с секретом Кощея, теперь вы готовы идти дальше и сразиться с Кощеем Бессмертным";
             result = RESULT_OK;
             path = R.layout.dialog_enemy;
         }
         else if (playerOnePoints < playerTwoPoints)
         {
-            text = "Кот-учёный победил!";
+            text = "Вы проиграли!";
             videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.kot_lose);
             questText = "Не расстраивайся. В следующий раз повезёт!";
             result = RESULT_CANCELED;

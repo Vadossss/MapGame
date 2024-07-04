@@ -324,12 +324,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     if (isCheckCameraPosition)
                         isCheckCameraPosition = false
 
-                    cameraPositionJob?.cancel()
-                    cameraPositionJob = coroutineScope.launch {
-                        delay(10000)
-                        isCheckCameraPosition = true
-//                        Log.d(TAG, "CheckCameraPosition")
-                    }
+//                    cameraPositionJob?.cancel()
+//                    cameraPositionJob = coroutineScope.launch {
+//                        delay(10000)
+//                        isCheckCameraPosition = true
+////                        Log.d(TAG, "CheckCameraPosition")
+//                    }
                     Log.d(TAG, "CheckCameraPosition: $isCheckCameraPosition")
                     } else {
                         isCheckCameraPosition = false

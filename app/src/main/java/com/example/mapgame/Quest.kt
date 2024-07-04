@@ -119,7 +119,7 @@ class Quest(private var activity: MainActivity, private var context: Context, pr
     }
 
     fun checkPositionQuest(userLocation: Point) {
-        val radius = 50.0 // Радиус в метрах
+        val radius = 20.0 // Радиус в метрах
         val results = FloatArray(1)
         Log.d(TAG, "Отладка")
         questList.flatten().forEach { quest ->

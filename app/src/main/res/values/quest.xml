@@ -21,15 +21,15 @@
 
     <string-array name="quest1.1">
         <item name="name">quest1.1</item>
-        <item name="latitude">57.733791</item>
-        <item name="longitude">40.915027</item>
-        <item name="location_name">КГУ</item>
+        <item name="latitude">57.774873</item>
+        <item name="longitude">40.892179</item>
+        <item name="location_name">Изба Ципелёва</item>
         <item name="text">Здесь ты найдёшь ларец</item>
         <item name="icon_path_white">@drawable/icon_kochei_white</item>
         <item name="icon_path">@drawable/icon_kochei</item>
         <item name="visible">true</item>
         <item name="achievement_name">Хранитель таинственного ларца</item>
-        <item name="achievement_text">Найти ларец с погибелю Кощея</item>
+        <item name="achievement_text">Найти ларец с погибелью Кощея</item>
         <item name="achievement_icon">@drawable/tree</item>
         <item name="type_quest">numbers</item>
         <item name="enemy_model">kosheyamin33</item>
@@ -38,9 +38,9 @@
     </string-array>
     <string-array name="quest1.2">
         <item name="name">quest1.2</item>
-        <item name="latitude">57.736959</item>
-        <item name="longitude">40.921242</item>
-        <item name="location_name">Школа</item>
+        <item name="latitude">57.775871</item>
+        <item name="longitude">40.891493</item>
+        <item name="location_name">Ильинская церковь</item>
         <item name="text">А здесь сидит кощей. Одолей его и освободи что-то</item>
         <item name="icon_path_white">@drawable/icon_kochei_white</item>
         <item name="icon_path">@drawable/icon_kochei</item>
@@ -55,15 +55,15 @@
     </string-array>
     <string-array name="quest2.1">
         <item name="name">quest2.1</item>
-        <item name="latitude">57.733911</item>
-        <item name="longitude">40.911479</item>
-        <item name="location_name">SAD</item>
+        <item name="latitude">57.775112</item>
+        <item name="longitude">40.893691</item>
+        <item name="location_name">Изба Липатова</item>
         <item name="text">Здесь тебя научат уму-разуму и поведают о секретах Соловья-Разбойника</item>
         <item name="icon_path_white">@drawable/icon_solovei_white</item>
         <item name="icon_path">@drawable/icon_solovei</item>
         <item name="visible">true</item>
-        <item name="achievement_name">На шаг впереди</item>
-        <item name="achievement_text">Узнать секреты Соловья-Разбойника</item>
+        <item name="achievement_name">Картёжник</item>
+        <item name="achievement_text">Выиграть игру в карты</item>
         <item name="achievement_icon">@drawable/tree</item>
         <item name="type_quest">memo</item>
         <item name="enemy_model">kosheyamin33</item>
@@ -72,19 +72,19 @@
     </string-array>
     <string-array name="quest2.2">
         <item name="name">quest2.2</item>
-        <item name="latitude">57.731862</item>
-        <item name="longitude">40.913116</item>
-        <item name="location_name">Паново</item>
-        <item name="text">Нужно тихо пробраться к Соловью, ведь победить его можно только хитростью</item>
+        <item name="latitude">57.773158</item>
+        <item name="longitude">40.892373</item>
+        <item name="location_name">Часовня из Притыкино</item>
+        <item name="text">Соловей загнан в угол. Сразись с ним и прогани с наших земель</item>
         <item name="icon_path_white">@drawable/icon_solovei_white</item>
         <item name="icon_path">@drawable/icon_solovei</item>
         <item name="visible">false</item>
-        <item name="achievement_name">Выбитый зуб</item>
+        <item name="achievement_name">Соловей повержен</item>
         <item name="achievement_text">Победить Соловья-Разбойника</item>
         <item name="achievement_icon">@drawable/tree</item>
         <item name="type_quest">battle</item>
-        <item name="enemy_model">kosheyamin33</item>
+        <item name="enemy_model">solovei_model</item>
         <item name="enemy_lives">200</item>
-        <item name="video">solovei</item>
+        <item name="video">solovei2</item>
     </string-array>
 </resources>

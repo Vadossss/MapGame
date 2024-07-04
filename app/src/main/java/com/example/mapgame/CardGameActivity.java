@@ -59,6 +59,11 @@ public class CardGameActivity extends AppCompatActivity {
             setResult(RESULT_CANCELED, intent);
             finish();
         });
+
+        Button btnSkip = (Button) findViewById(R.id.btnSkipGame);
+        btnSkip.setOnClickListener(v -> {
+            dialog();
+        });
     }
 
     private List<Card> generateCards() {
@@ -115,36 +120,7 @@ public class CardGameActivity extends AppCompatActivity {
                 selectedCard.setMatched(true);
                 clickedCard.setMatched(true);
                 if (allCardsMatched()) {
-                    fade.fadeInDimmingView();
-                    videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.solovei_win1);
-                    setVideo();
-                    videoDialog.setOnCompletionListener( v -> {
-                        videoDialog.stopPlayback();
-                        fade.fadeOutView();
-                        videoDialog.setVisibility(View.INVISIBLE);
-                        fade.fadeInDimmingView();
-                        View dialog = new View(this);
-                        dialog = LayoutInflater.from(this).inflate(R.layout.dialog_enemy, null);
-                        Dialog myDialog = new Dialog(this);
-                        TextView text = (TextView) dialog.findViewById(R.id.locationQuest);
-                        TextView questText = (TextView) dialog.findViewById(R.id.questText);
-                        questText.setText("Вы смогли победить Соловья, но это не всё. В следующий раз его уловки на вас не сработают!");
-                        text.setText("Вы выиграли!");
-                        myDialog.setContentView(dialog);
-                        myDialog.setCancelable(false);
-                        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        myDialog.getWindow().setWindowAnimations(R.style.dialog_animation_fade);
-                        myDialog.show();
-
-
-                        Button button = (Button) dialog.findViewById(R.id.btnBattle);
-                        button.setText("Выйти на карту");
-                        button.setOnClickListener(s -> {
-                            myDialog.dismiss();
-                            finishGame(RESULT_OK);
-                        });
-
-                    });
+                    dialog();
                 }
                 else {
                     resetTurn();
@@ -194,6 +170,40 @@ public class CardGameActivity extends AppCompatActivity {
             });
 
         }
+    }
+
+    private void dialog() {
+        FadePressets fade = new FadePressets(this, this);
+        fade.fadeInDimmingView();
+        videoDialog.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.solovei_win1);
+        setVideo();
+        videoDialog.setOnCompletionListener( v -> {
+            videoDialog.stopPlayback();
+            fade.fadeOutView();
+            videoDialog.setVisibility(View.INVISIBLE);
+            fade.fadeInDimmingView();
+            View dialog = new View(this);
+            dialog = LayoutInflater.from(this).inflate(R.layout.dialog_enemy, null);
+            Dialog myDialog = new Dialog(this);
+            TextView text = (TextView) dialog.findViewById(R.id.locationQuest);
+            TextView questText = (TextView) dialog.findViewById(R.id.questText);
+            questText.setText("Вы смогли победить Соловья и освободить избу Липатова, но он смог сбежать. Найдите его и не дайте сбежать вновь!");
+            text.setText("Вы выиграли!");
+            myDialog.setContentView(dialog);
+            myDialog.setCancelable(false);
+            myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            myDialog.getWindow().setWindowAnimations(R.style.dialog_animation_fade);
+            myDialog.show();
+
+
+            Button button = (Button) dialog.findViewById(R.id.btnBattle);
+            button.setText("Выйти на карту");
+            button.setOnClickListener(s -> {
+                myDialog.dismiss();
+                finishGame(RESULT_OK);
+            });
+
+        });
     }
 
     private boolean allCardsMatched() {
