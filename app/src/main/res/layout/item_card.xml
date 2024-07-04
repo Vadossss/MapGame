@@ -19,8 +19,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:scaleType="centerCrop"
-            android:src="@drawable/card_back" />
+            android:scaleType="fitXY"
+            android:src="@drawable/card_ba" />
 
         <ImageView
             android:id="@+id/card_front"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:scaleType="centerCrop"
+            android:scaleType="fitXY"
             android:visibility="gone" />
     </FrameLayout>
 </androidx.cardview.widget.CardView>

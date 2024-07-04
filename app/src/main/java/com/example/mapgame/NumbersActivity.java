@@ -250,31 +250,29 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
             startDialog(text, finalResult, questText, path);
         });
 
-        videoDialog.setOnClickListener(v -> {
-
-
-                    Log.d(TAG, "Action Down Detected");
-                    if (btnClose.getVisibility() == View.INVISIBLE) {
-                        fade.fadeIn(btnClose);
-                        Log.d("TouchEvent", "Fading In");
-//                        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-//                            try {
-//                                // Симуляция длительной задачи
-//                                Thread.sleep(3000);
-//                                fade.fadeOut(btnClose);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
-//                        future.join();
-                    }
-                    else {
-                        fade.fadeOut(btnClose);
-                        Log.d("TouchEvent", "Fading Out");
-                    }
-
-            }
-        );
+//        videoDialog.setOnClickListener(v -> {
+//            Log.d(TAG, "Action Down Detected");
+//            if (btnClose.getVisibility() == View.INVISIBLE) {
+//                fade.fadeIn(btnClose);
+//                Log.d("TouchEvent", "Fading In");
+////                        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+////                            try {
+////                                // Симуляция длительной задачи
+////                                Thread.sleep(3000);
+////                                fade.fadeOut(btnClose);
+////                            } catch (InterruptedException e) {
+////                                e.printStackTrace();
+////                            }
+////                        });
+////                        future.join();
+//            }
+//            else {
+//                fade.fadeOut(btnClose);
+//                Log.d("TouchEvent", "Fading Out");
+//            }
+//
+//            }
+//        );
 
         //Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
         TimeUnit.SECONDS.sleep(2);
@@ -310,13 +308,15 @@ public class NumbersActivity extends AppCompatActivity implements Game.ResultsCa
         TextView questTextView = (TextView) dialog.findViewById(R.id.questText);
         questTextView.setText(questText);
         Button button = (Button) dialog.findViewById(R.id.btnBattle);
-        Button buttonReboot = (Button) dialog.findViewById(R.id.btnReboot);
-        buttonReboot.setOnClickListener(v -> {
-            myDialog.dismiss();
-            Intent intent = new Intent(this, NumbersActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        if (path == R.layout.dialog_lose) {
+            Button buttonReboot = (Button) dialog.findViewById(R.id.btnReboot);
+            buttonReboot.setOnClickListener(v -> {
+                myDialog.dismiss();
+                Intent intent = new Intent(this, NumbersActivity.class);
+                startActivity(intent);
+                finish();
+            });
+        }
         button.setText("Вернуться на карту");
         button.setOnClickListener(v -> {
             myDialog.dismiss();

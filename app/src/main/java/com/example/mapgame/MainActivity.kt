@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -164,7 +165,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // Пример списка достижений
         info.recycle()
 
-        achieveList.adapter = AchievementAdapter(achievements)
+        achieveList.adapter = AchievementAdapter(achievements) { achievement ->
+            // Обработка клика по элементу достижения
+            Toast.makeText(this, "Clicked: ${achievement.name}", Toast.LENGTH_SHORT).show()
+        }
         //textQuest.text = questText
         myDialog.show()
     }

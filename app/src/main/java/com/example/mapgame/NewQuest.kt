@@ -38,6 +38,7 @@ import com.yandex.mapkit.map.TextStyle
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -103,8 +104,8 @@ class NewQuest {
         typeQuest = questInfo[11]
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
-        videoPath = context.getResources().getIdentifier(questInfo[12], "raw", context.packageName)
-        setVideo()
+        videoPath = context.getResources().getIdentifier(questInfo[14], "raw", context.packageName)
+
         this.activity = activity
         resultLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -148,7 +149,7 @@ class NewQuest {
         mainActiv = context as Activity
         video = mainActiv.findViewById(R.id.videoCom)
         videoPath = context.getResources().getIdentifier(questInfo[14], "raw", context.packageName)
-        setVideo()
+
         this.activity = activity
         resultLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -307,6 +308,7 @@ class NewQuest {
 
     @SuppressLint("ClickableViewAccessibility")
     fun newDialog() {
+        setVideo()
         val fade = FadePressets(context, mainActiv)
         DialogManager.closeAllDialogs()
         val dialogBinding = LayoutInflater.from(context).inflate(R.layout.dialog_enemy, null)
@@ -350,13 +352,15 @@ class NewQuest {
             }
 
 
-
+            var cameraPositionJob : Job? = null
+            val scope = CoroutineScope(Dispatchers.Main)
             video.setOnTouchListener {_, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     if (btnClose.visibility == View.INVISIBLE) {
                         fade.fadeIn(btnClose)
-                        val scope = CoroutineScope(Dispatchers.Main)
-                        scope.launch {
+
+                        cameraPositionJob?.cancel()
+                        cameraPositionJob = scope.launch {
                             delay(3000)
                             fade.fadeOut(btnClose)
                         }

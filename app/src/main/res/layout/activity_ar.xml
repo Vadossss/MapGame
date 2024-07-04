@@ -36,11 +36,4 @@
 
     </LinearLayout>
 
-    <VideoView
-        android:id="@+id/videoView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        tools:layout_editor_absoluteY="732dp" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
